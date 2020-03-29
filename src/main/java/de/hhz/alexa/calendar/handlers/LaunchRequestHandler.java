@@ -17,6 +17,8 @@ import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.LaunchRequest;
 import com.amazon.ask.model.Response;
+import com.amazon.ask.request.RequestHelper;
+import com.google.api.client.util.Strings;
 
 import java.util.Optional;
 
@@ -32,6 +34,10 @@ public class LaunchRequestHandler implements RequestHandler {
     @Override
     public Optional<Response> handle(HandlerInput input) {
         String speechText = "Vorlesungskalendar geöffnet. Du kannst z.B. sagen Vorlesung";
+        RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
+		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
+			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
+		}
         return input.getResponseBuilder()
                 .withSpeech(speechText)
                 .withSimpleCard("Vorlesung", speechText)

@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("deprecation")
 public class CalendarUtils {
-	private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
+	private static final String APPLICATION_NAME = "Alexa4HHZ";
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	private static final String VALUE_PATTERN = "([a-zA-Z0-9]*)(: )([a-zA-Z0-9]* [a-zA-Z0-9]*) ([(a-zA-Z0-9. )]*)";
 	private Pattern mPattern = Pattern.compile(VALUE_PATTERN);
 	private static final String HHZ_CALENDAR = "9fbtqhp79a3oqvq6v0ur434j2s@group.calendar.google.com";
 	private String accesTocken;
 
-	public CalendarUtils(String acessTocken) {
+	public CalendarUtils(final String acessTocken) {
 		this.accesTocken = acessTocken;
 	}
 
@@ -36,7 +37,7 @@ public class CalendarUtils {
 		Events events = null;
 	
 			final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			@SuppressWarnings("deprecation")
+		
 			GoogleCredential credential = new GoogleCredential().setAccessToken(this.accesTocken);
 			Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 					.setApplicationName(APPLICATION_NAME).build();

@@ -15,7 +15,8 @@ import java.util.Optional;
 import static com.amazon.ask.request.Predicates.intentName;
 
 public class ListEventByDateIntentHandler implements RequestHandler {
-	StringBuilder sb = new StringBuilder();
+	private StringBuilder mStringBuilder;
+
 	@Override
 	public boolean canHandle(HandlerInput input) {
 		return input.matches(intentName("ListEventByDateIntent"));
@@ -26,35 +27,35 @@ public class ListEventByDateIntentHandler implements RequestHandler {
 
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
-			String speech = "Der Kalendar is nicht verknüpft. Verknüpfen Sie es bitte über die Skilleinstellung.";
-			return input.getResponseBuilder().withSpeech(speech).withSimpleCard("Vorlesung", speech).build();
+			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
+			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
 		BDCourse mBdEvent = new BDCourse(requestHelper.getAccountLinkingAccessToken());
 		Optional<String> optionalDate = requestHelper.getSlotValue("date");
+		mStringBuilder = new StringBuilder();
 
-		if (!optionalDate.isEmpty()) {
-			sb.append(optionalDate.get());
-			sb.append(" ");
-			sb.append("hast du");
-			try {
-				List<Course> myCourse = mBdEvent.listSubjects(optionalDate.get());
+		try {
+			List<Course> myCourse = mBdEvent.listSubjectByDay(optionalDate.orElse(""));
+			if (myCourse.size() < 1) {
+				mStringBuilder.append("Du hast ");
+				mStringBuilder.append(optionalDate.orElse(""));
+				mStringBuilder.append(" ");
+				mStringBuilder.append("keine Vorlesung");
+			} else {
+				mStringBuilder.append(optionalDate.orElse("Dem nächst"));
+				mStringBuilder.append(" ");
+				mStringBuilder.append("hast du ");
 				myCourse.forEach(element -> {
-					sb.append(element.getDescription());
-					sb.append(",");
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(",");
 				});
-
-				if (myCourse.size() < 1) {
-					sb = new StringBuilder();
-					sb.append("Du hast ");
-					sb.append(optionalDate.get());
-					sb.append(" ");
-					sb.append("keine Vorlesung");
-				}
-			} catch (Exception e) {
-				sb.append(e.getMessage());
 			}
+		} catch (Exception e) {
+			mStringBuilder.append(e.getMessage());
 		}
-		return input.getResponseBuilder().withSpeech(sb.toString()).withSimpleCard("Vorlesung", sb.toString()).build();
+
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
 	}
 
 }
