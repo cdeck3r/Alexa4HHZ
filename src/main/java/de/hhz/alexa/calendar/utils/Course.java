@@ -1,6 +1,7 @@
 package de.hhz.alexa.calendar.utils;
 
 import java.util.Date;
+
 public class Course {
 	private String description;
 	private String teacher;
@@ -9,12 +10,14 @@ public class Course {
 	private Date startTime;
 	private Date endTime;
 	private Date lastModified;
+	private String location;
 
-	public Course(String description, String organizer, String discipline, Date startTime) {
+	public Course(String description, String organizer, String discipline, Date startTime, String location) {
 		this.description = description;
 		this.teacher = organizer;
 		this.discipline = discipline;
-		this.startTime=startTime;
+		this.startTime = startTime;
+		this.location = location;
 	}
 
 	public String getDescription() {
@@ -71,5 +74,13 @@ public class Course {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 }

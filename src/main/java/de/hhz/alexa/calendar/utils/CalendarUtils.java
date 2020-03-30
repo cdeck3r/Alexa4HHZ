@@ -49,7 +49,7 @@ public class CalendarUtils {
 				Matcher mMatcher = mPattern.matcher(event.getSummary());
 				if (mMatcher.find()) {
 					eventList.add(new Course(mMatcher.group(3), mMatcher.group(4).replaceAll("[(,)]", ""),
-							mMatcher.group(1),new Date(event.getStart().getDateTime().getValue())));
+							mMatcher.group(1),new Date(event.getStart().getDateTime().getValue()), event.getLocation()));
 				}
 			}
 
