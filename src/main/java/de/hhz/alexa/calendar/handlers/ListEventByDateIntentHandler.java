@@ -38,8 +38,6 @@ public class ListEventByDateIntentHandler implements RequestHandler {
 		Optional<String> optionalDate = requestHelper.getSlotValue("date");
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
-//		speechText="<speak>Das Datum von <say-as interpret-as=\"cardinal\">2020-W13</say-as></speak>";
-
 		try {
 			List<Course> myCourse = mBdEvent.listSubjectByDay(optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
@@ -71,10 +69,10 @@ public class ListEventByDateIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
+				.withSimpleCard("Vorlesung", mStringBuilder.toString()).withShouldEndSession(false).build();
 	}
 
-	private String parseDate(Date date) {
+	private String parseDate(final Date date) {
 		SimpleDateFormat sdf;
 		sdf = new SimpleDateFormat("yyyyMMdd,HH:mm");
 		sdf.setTimeZone(TimeZone.getTimeZone("CET"));
