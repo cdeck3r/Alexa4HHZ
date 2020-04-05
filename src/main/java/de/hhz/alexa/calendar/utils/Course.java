@@ -11,13 +11,19 @@ public class Course {
 	private Date endTime;
 	private Date lastModified;
 	private String location;
+	private String id;
+	private String eTag;
+	private boolean cancelled;
 
-	public Course(String description, String organizer, String discipline, Date startTime, String location) {
+	public Course(String description, String organizer, String discipline, Date startTime, String location, String id,
+			String eTag) {
 		this.description = description;
 		this.teacher = organizer;
 		this.discipline = discipline;
 		this.startTime = startTime;
 		this.location = location;
+		this.id = id;
+		this.eTag = eTag;
 	}
 
 	public String getDescription() {
@@ -82,5 +88,29 @@ public class Course {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String geteTag() {
+		return eTag;
+	}
+
+	public void seteTag(String eTag) {
+		this.eTag = eTag;
+	}
+
+	public boolean isCancelled() {
+		return cancelled;
+	}
+
+	public void setCancelled(boolean canceled) {
+		this.cancelled = canceled;
 	}
 }

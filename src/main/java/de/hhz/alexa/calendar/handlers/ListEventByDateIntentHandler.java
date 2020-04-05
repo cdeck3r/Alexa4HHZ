@@ -5,7 +5,6 @@ import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
-import com.amazonaws.util.DateUtils;
 import com.google.api.client.util.Strings;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.Course;
@@ -34,12 +33,12 @@ public class ListEventByDateIntentHandler implements RequestHandler {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
-		BDCourse mBdEvent = new BDCourse(requestHelper.getAccountLinkingAccessToken());
 		Optional<String> optionalDate = requestHelper.getSlotValue("date");
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
-			List<Course> myCourse = mBdEvent.listSubjectByDay(optionalDate.orElse(""));
+			List<Course> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
+					.listSubjects(optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Du hast ");
 				// mStringBuilder.append(optionalDate.orElse(""));
@@ -52,14 +51,13 @@ public class ListEventByDateIntentHandler implements RequestHandler {
 				myCourse.forEach(element -> {
 					String dateString = parseDate(element.getStartTime());
 					mStringBuilder.append("am ");
-					mStringBuilder.append(
-							"<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
+					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
-					mStringBuilder.append("im ");
+					mStringBuilder.append("in ");
 					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
 					mStringBuilder.append(",");
 				});
@@ -69,14 +67,14 @@ public class ListEventByDateIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Vorlesung", mStringBuilder.toString()).withShouldEndSession(false).build();
+				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
 	}
 
-	private String parseDate(final Date date) {
+	public static String parseDate(final Date date) {
 		SimpleDateFormat sdf;
 		sdf = new SimpleDateFormat("yyyyMMdd,HH:mm");
 		sdf.setTimeZone(TimeZone.getTimeZone("CET"));
-    	String dateString=sdf.format(date);
-		return dateString.replace(dateString.substring(0,4), "????");
+		String dateString = sdf.format(date);
+		return dateString.replace(dateString.substring(0, 4), "????");
 	}
 }
