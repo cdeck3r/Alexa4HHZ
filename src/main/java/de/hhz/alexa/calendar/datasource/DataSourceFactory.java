@@ -27,7 +27,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import com.fasterxml.jackson.core.JsonParseException;
 
-import de.hhz.alexa.calendar.utils.Course;
+import de.hhz.alexa.calendar.utils.HHZEvent;
 
 public class DataSourceFactory {
 	private String tableName = "Events";
@@ -37,25 +37,25 @@ public class DataSourceFactory {
 
 	private DataSourceFactory() throws InterruptedException {
 		client = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
-//				new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "us-west-2")).build();
-				new AwsClientBuilder.EndpointConfiguration("https://dynamodb.us-east-1.amazonaws.com", "us-east-1")).build();
+				new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "us-west-2")).build();
+//				new AwsClientBuilder.EndpointConfiguration("https://dynamodb.us-east-1.amazonaws.com", "us-east-1")).build();
 		DynamoDB dynamoDB = new DynamoDB(client);
 		this.table = dynamoDB.getTable(tableName);
 //		this.table.delete();
-//		List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
-//		attributeDefinitions.add(new AttributeDefinition().withAttributeName("id").withAttributeType("S"));
-//
-//		List<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
-//		keySchema.add(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH));
-//
-//		CreateTableRequest request = new CreateTableRequest().withTableName(tableName).withKeySchema(keySchema)
-//				.withAttributeDefinitions(attributeDefinitions).withProvisionedThroughput(
-//						new ProvisionedThroughput().withReadCapacityUnits(5L).withWriteCapacityUnits(5L));
-//		TableUtils.createTableIfNotExists(client, request);
-//		this.table.waitForActive();
+		List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+		attributeDefinitions.add(new AttributeDefinition().withAttributeName("id").withAttributeType("S"));
+
+		List<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
+		keySchema.add(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH));
+
+		CreateTableRequest request = new CreateTableRequest().withTableName(tableName).withKeySchema(keySchema)
+				.withAttributeDefinitions(attributeDefinitions).withProvisionedThroughput(
+						new ProvisionedThroughput().withReadCapacityUnits(5L).withWriteCapacityUnits(5L));
+		TableUtils.createTableIfNotExists(client, request);
+		this.table.waitForActive();
 	}
 
-	public void saveEvents(List<Course> courses) {
+	public void saveEvents(List<HHZEvent> courses) {
 		if (Objects.isNull(courses) || courses.size() < 1) {
 			return;
 		}
@@ -64,7 +64,7 @@ public class DataSourceFactory {
 		});
 	}
 
-	public void updateEvent(Course course) {
+	public void updateEvent(HHZEvent course) {
 		if (Objects.isNull(course) || course.isCancelled()) {
 			return;
 		}
@@ -72,11 +72,11 @@ public class DataSourceFactory {
 				.withUpdateExpression("set eTag = :e").withValueMap(new ValueMap().withString(":e", course.geteTag()))
 				.withReturnValues(ReturnValue.UPDATED_NEW);
 
-		System.out.println("Updating the item...");
+		System.out.println("Update the item "+course.getDescription());
 		this.table.updateItem(updateItemSpec);
 	}
 
-	public void deleteEvent(Course course) {
+	public void deleteEvent(HHZEvent course) {
 		if (Objects.isNull(course) || !course.isCancelled()) {
 			return;
 		}

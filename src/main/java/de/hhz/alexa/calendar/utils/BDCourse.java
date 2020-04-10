@@ -1,39 +1,65 @@
 package de.hhz.alexa.calendar.utils;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.http.auth.Credentials;
+
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.Strings;
 
 public class BDCourse {
 	private static final String KW = "W";
+	private static final CharSequence SUFFIX_EXAM = "prüfung";
 	private static BDCourse mBDCourse;
 	private CalendarUtils mCalendarUtils;
 
-	private BDCourse(final String accessTocken) {
+	private BDCourse(final Credential accessTocken) {
 		this.mCalendarUtils = new CalendarUtils(accessTocken);
 	}
 
-	public List<Course> listSubjects() throws Exception {
-
-		return this.mCalendarUtils.listEvents();
-	}
-
-	public List<Course> listSubjectByTeacher(final String teachter) throws Exception {
+	public List<HHZEvent> listLecturesByTeacher(final String teachter) throws Exception {
 		String myTeacher = teachter.split(" ").length > 1 ? teachter.split(" ")[1] : teachter;
-		return this.mCalendarUtils.listEvents().stream()
-				.filter(element -> element.getTeacher().toLowerCase().contains(myTeacher.toLowerCase()))
-				.collect(Collectors.toList());
+		return this.mCalendarUtils.listEvents().stream().filter(
+				element -> element.isCourse() && element.getTeacher().toLowerCase().contains(myTeacher.toLowerCase()))
+				.limit(1).collect(Collectors.toList());
 	}
 
+	/**
+	 * List courses
+	 */
 	@SuppressWarnings("deprecation")
-	public List<Course> listSubjects(final String dateString) throws Exception {
-		List<Course> courses = mCalendarUtils.listEvents();
+	public List<HHZEvent> listLectureByDate(final String dateString) throws Exception {
+		List<HHZEvent> courses = mCalendarUtils.listEvents();
+		int MAX = 1;
 		if (Strings.isNullOrEmpty(dateString)) {
-			return courses;
+			courses = courses.stream().filter(element -> element.isCourse()).limit(MAX).collect(Collectors.toList());
+		} else {
+			courses = courses.stream()
+					.filter(element -> element.isCourse() && filterByDate(dateString, element.getStartTime()))
+					.collect(Collectors.toList());
 		}
-		return courses.stream().filter(element -> filterByDate(dateString, element.getStartTime()))
+
+		return courses;
+	}
+
+	/**
+	 * List events that are not course
+	 * 
+	 * @param dateString
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("deprecation")
+	public List<HHZEvent> listEventByDate(final String dateString) throws Exception {
+		List<HHZEvent> courses = mCalendarUtils.listEvents();
+		if (Strings.isNullOrEmpty(dateString)) {
+			return courses.stream().filter(element -> !element.isCourse()).limit(1).collect(Collectors.toList());
+		}
+		return courses.stream()
+				.filter(element -> !element.isCourse() && filterByDate(dateString, element.getStartTime())).limit(1)
 				.collect(Collectors.toList());
 	}
 
@@ -54,12 +80,49 @@ public class BDCourse {
 		return false;
 	}
 
-	public List<Course> listModifiedEvents() throws Exception {
+	public List<HHZEvent> listModifiedEvents() throws Exception {
 		return mCalendarUtils.listModifiedEvents();
 
 	}
 
-	public static BDCourse getInstance(String tocken) {
+	/**
+	 * Return the next date for a given event name
+	 * 
+	 * @throws Exception
+	 */
+	public List<HHZEvent> listEventByName(String subject) throws Exception {
+
+		if (Strings.isNullOrEmpty(subject)) {
+			return null;
+		}
+		return this.mCalendarUtils.listEvents().stream()
+				.filter(element -> element.getDescription().toLowerCase().contains(subject.toLowerCase())).limit(1)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Return the next course of a given semester.
+	 * 
+	 * @throws Exception
+	 */
+	public List<HHZEvent> listLectureBySemester(String semester) throws Exception {
+		return this.mCalendarUtils.listEvents().stream()
+				.filter(element -> element.isCourse() && element.getSemester().contains(semester)).limit(4)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * List the exams
+	 * 
+	 * @throws Exception
+	 */
+	public List<HHZEvent> listExams() throws Exception {
+		return this.mCalendarUtils.listEvents().stream().filter(element -> element.isCourse()
+				&& element.getType() != null && element.getType().toLowerCase().contains(SUFFIX_EXAM))
+				.collect(Collectors.toList());
+	}
+
+	public static BDCourse getInstance(Credential tocken) {
 		if (mBDCourse != null) {
 			return mBDCourse;
 		}

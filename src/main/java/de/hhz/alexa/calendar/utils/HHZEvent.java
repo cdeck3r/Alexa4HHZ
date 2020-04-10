@@ -2,10 +2,9 @@ package de.hhz.alexa.calendar.utils;
 
 import java.util.Date;
 
-public class Course {
+public class HHZEvent {
 	private String description;
 	private String teacher;
-	private String discipline;
 	private String semester;
 	private Date startTime;
 	private Date endTime;
@@ -14,12 +13,14 @@ public class Course {
 	private String id;
 	private String eTag;
 	private boolean cancelled;
+	private boolean isCourse;
+	private String type;
 
-	public Course(String description, String organizer, String discipline, Date startTime, String location, String id,
+	public HHZEvent(String description, String organizer, String semester, Date startTime, String location, String id,
 			String eTag) {
 		this.description = description;
 		this.teacher = organizer;
-		this.discipline = discipline;
+		this.semester = semester;
 		this.startTime = startTime;
 		this.location = location;
 		this.id = id;
@@ -40,14 +41,6 @@ public class Course {
 
 	public void setOrganizer(String teacher) {
 		this.teacher = teacher;
-	}
-
-	public String getDiscipline() {
-		return discipline;
-	}
-
-	public void setDiscipline(String discipline) {
-		this.discipline = discipline;
 	}
 
 	public String getSemester() {
@@ -112,5 +105,21 @@ public class Course {
 
 	public void setCancelled(boolean canceled) {
 		this.cancelled = canceled;
+	}
+
+	public boolean isCourse() {
+		return isCourse;
+	}
+
+	public void setCourse(boolean isCourse) {
+		this.isCourse = isCourse;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

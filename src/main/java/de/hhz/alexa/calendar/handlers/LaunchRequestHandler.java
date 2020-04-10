@@ -21,7 +21,8 @@ import com.amazon.ask.request.RequestHelper;
 import com.google.api.client.util.Strings;
 
 import de.hhz.alexa.calendar.utils.BDCourse;
-import de.hhz.alexa.calendar.utils.Course;
+import de.hhz.alexa.calendar.utils.HHZEvent;
+import de.hhz.alexa.calendar.utils.Utils;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,7 @@ public class LaunchRequestHandler implements RequestHandler {
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 		}
-		List<Course> myCourse = null;
+		List<HHZEvent> myCourse = null;
 		StringBuilder mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
@@ -51,7 +52,7 @@ public class LaunchRequestHandler implements RequestHandler {
 			if (myCourse != null & myCourse.size() > 0) {
 				mStringBuilder.append("Deine Vorlesung wurde verschoben.");
 				myCourse.forEach(element -> {
-					String dateString = ListEventByDateIntentHandler.parseDate(element.getStartTime());
+					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("am ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
