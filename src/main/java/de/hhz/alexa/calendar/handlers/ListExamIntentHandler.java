@@ -9,21 +9,17 @@ import com.google.api.client.util.Strings;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 import static com.amazon.ask.request.Predicates.intentName;
 
-public class ListLectureIntentHandler implements RequestHandler {
+public class ListExamIntentHandler implements RequestHandler {
 	private StringBuilder mStringBuilder;
 
 	@Override
 	public boolean canHandle(HandlerInput input) {
-		return input.matches(intentName("ListLectureIntent"));
+		return input.matches(intentName("ListExamIntent"));
 	}
 
 	@Override
@@ -34,19 +30,15 @@ public class ListLectureIntentHandler implements RequestHandler {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
-		Optional<String> optionalDate = requestHelper.getSlotValue("date");
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
-					.listLectureByDate(optionalDate.orElse(""));
+					.listExams();
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Du hast ");
-				mStringBuilder.append(" ");
-				mStringBuilder.append("keine Vorlesung");
+				mStringBuilder.append("Keine Prüfung gefunden");
 			} else {
-				mStringBuilder.append("Du hast ");
-				mStringBuilder.append("am ");
+				mStringBuilder.append("Die nächste Prüfungen sind ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
@@ -65,7 +57,8 @@ public class ListLectureIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
+				.withSimpleCard("Prüfung", mStringBuilder.toString()).build();
 	}
+
 
 }

@@ -20,6 +20,11 @@ import de.hhz.alexa.calendar.handlers.CancelandStopIntentHandler;
 import de.hhz.alexa.calendar.handlers.FallbackIntentHandler;
 import de.hhz.alexa.calendar.handlers.HelpIntentHandler;
 import de.hhz.alexa.calendar.handlers.LaunchRequestHandler;
+import de.hhz.alexa.calendar.handlers.ListEventByNameIntentHandler;
+import de.hhz.alexa.calendar.handlers.ListEventIntentHandler;
+import de.hhz.alexa.calendar.handlers.ListExamIntentHandler;
+import de.hhz.alexa.calendar.handlers.ListLectureBySemesterIntentHandler;
+import de.hhz.alexa.calendar.handlers.ListLectureByTeacherIntentHandler;
 import de.hhz.alexa.calendar.handlers.ListLectureIntentHandler;
 import de.hhz.alexa.calendar.handlers.SessionEndedRequestHandler;
 
@@ -38,7 +43,12 @@ public class CalendarStreamHandler extends SkillStreamHandler {
                         new HelpIntentHandler(),
                         new LaunchRequestHandler(),
                         new SessionEndedRequestHandler(),
-                        new FallbackIntentHandler())
+                        new FallbackIntentHandler(),
+                        new ListLectureBySemesterIntentHandler(),
+                        new ListLectureByTeacherIntentHandler(),
+                        new ListEventByNameIntentHandler(),
+                        new ListEventIntentHandler(),
+                        new ListExamIntentHandler())
                 // Add your skill id below
                 //.withSkillId("")
                 .build();

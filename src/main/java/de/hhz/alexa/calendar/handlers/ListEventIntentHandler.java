@@ -9,12 +9,9 @@ import com.google.api.client.util.Strings;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
+
 
 import static com.amazon.ask.request.Predicates.intentName;
 
@@ -41,20 +38,20 @@ public class ListEventIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listEventByDate(optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt kein Event");
-				mStringBuilder.append(optionalDate.get());
+				mStringBuilder.append("Es gibt kein Event.");
+				mStringBuilder.append(optionalDate.orElse(""));
 			} else {
 				mStringBuilder.append("Das nächste Event ist ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(" ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");
-					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
+//					mStringBuilder.append("in ");
+//					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
 					mStringBuilder.append(" . ");
 				});
 			}

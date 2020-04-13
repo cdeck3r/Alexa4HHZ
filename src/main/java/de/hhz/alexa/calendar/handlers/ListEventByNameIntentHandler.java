@@ -18,12 +18,12 @@ import java.util.TimeZone;
 
 import static com.amazon.ask.request.Predicates.intentName;
 
-public class ListLectureIntentHandler implements RequestHandler {
+public class ListEventByNameIntentHandler implements RequestHandler {
 	private StringBuilder mStringBuilder;
 
 	@Override
 	public boolean canHandle(HandlerInput input) {
-		return input.matches(intentName("ListLectureIntent"));
+		return input.matches(intentName("ListEventByNameIntent"));
 	}
 
 	@Override
@@ -34,29 +34,27 @@ public class ListLectureIntentHandler implements RequestHandler {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
-		Optional<String> optionalDate = requestHelper.getSlotValue("date");
+		Optional<String> name = requestHelper.getSlotValue("name");
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
-					.listLectureByDate(optionalDate.orElse(""));
+					.listEventByName(name.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Du hast ");
-				mStringBuilder.append(" ");
-				mStringBuilder.append("keine Vorlesung");
+				mStringBuilder.append("Es gibt kein Event mit dem Name ");
+				mStringBuilder.append(name.get());
 			} else {
-				mStringBuilder.append("Du hast ");
 				mStringBuilder.append("am ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ");
+					mStringBuilder.append(" gibt es ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
 					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
+					mStringBuilder.append(element.getLocation());
 					mStringBuilder.append(" . ");
 				});
 			}
@@ -67,5 +65,6 @@ public class ListLectureIntentHandler implements RequestHandler {
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
 				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
 	}
+
 
 }

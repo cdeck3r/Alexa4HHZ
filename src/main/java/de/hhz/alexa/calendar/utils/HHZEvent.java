@@ -2,6 +2,8 @@ package de.hhz.alexa.calendar.utils;
 
 import java.util.Date;
 
+import com.google.api.client.util.Strings;
+
 public class HHZEvent {
 	private String description;
 	private String teacher;
@@ -14,6 +16,7 @@ public class HHZEvent {
 	private String eTag;
 	private boolean cancelled;
 	private boolean isCourse;
+	private boolean isPosponed;
 	private String type;
 
 	public HHZEvent(String description, String organizer, String semester, Date startTime, String location, String id,
@@ -25,6 +28,10 @@ public class HHZEvent {
 		this.location = location;
 		this.id = id;
 		this.eTag = eTag;
+	}
+
+	public HHZEvent() {
+
 	}
 
 	public String getDescription() {
@@ -121,5 +128,22 @@ public class HHZEvent {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public boolean isPosponed() {
+		return isPosponed;
+	}
+
+	public void setPosponed(boolean isPosponed) {
+		this.isPosponed = isPosponed;
+	}
+	
+    @Override
+	public boolean equals(Object o) {
+		if (o instanceof HHZEvent) {
+			HHZEvent toCompare = (HHZEvent) o;
+			return this.id.equals(toCompare.id);
+		}
+		return false;
 	}
 }

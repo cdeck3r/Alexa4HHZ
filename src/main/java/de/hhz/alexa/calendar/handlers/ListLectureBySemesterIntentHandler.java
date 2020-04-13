@@ -18,12 +18,12 @@ import java.util.TimeZone;
 
 import static com.amazon.ask.request.Predicates.intentName;
 
-public class ListLectureByTeacherHandler implements RequestHandler {
+public class ListLectureBySemesterIntentHandler implements RequestHandler {
 	private StringBuilder mStringBuilder;
 
 	@Override
 	public boolean canHandle(HandlerInput input) {
-		return input.matches(intentName("ListLectureByTeacherIntent"));
+		return input.matches(intentName("ListLectureBySemesterIntent"));
 	}
 
 	@Override
@@ -34,19 +34,19 @@ public class ListLectureByTeacherHandler implements RequestHandler {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
-		Optional<String> optionalTeacher = requestHelper.getSlotValue("teacher");
+		Optional<String> optionalSemester = requestHelper.getSlotValue("semester");
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
-					.listLecturesByTeacher(optionalTeacher.orElse(""));
+					.listLectureBySemester(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Keine Vorlesung von ");
-				mStringBuilder.append(optionalTeacher.get());
+				mStringBuilder.append("Keine Vorlesung für das Semester");
+				mStringBuilder.append(optionalSemester.get());
 				mStringBuilder.append(" gefunden");
 			} else {
-				mStringBuilder.append("Die nächste Vorlesung von ");
-				mStringBuilder.append(optionalTeacher.get());
+				mStringBuilder.append("Die nächste Vorlesung von Semester");
+				mStringBuilder.append(optionalSemester.get());
 				mStringBuilder.append(" sind:");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());

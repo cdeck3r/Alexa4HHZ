@@ -20,6 +20,9 @@ public class BDCourse {
 		this.mCalendarUtils = new CalendarUtils(accessTocken);
 	}
 
+	private BDCourse(final String accessTocken) {
+		this.mCalendarUtils = new CalendarUtils(accessTocken);
+	}
 	public List<HHZEvent> listLecturesByTeacher(final String teachter) throws Exception {
 		String myTeacher = teachter.split(" ").length > 1 ? teachter.split(" ")[1] : teachter;
 		return this.mCalendarUtils.listEvents().stream().filter(
@@ -33,7 +36,7 @@ public class BDCourse {
 	@SuppressWarnings("deprecation")
 	public List<HHZEvent> listLectureByDate(final String dateString) throws Exception {
 		List<HHZEvent> courses = mCalendarUtils.listEvents();
-		int MAX = 1;
+		int MAX = 100;
 		if (Strings.isNullOrEmpty(dateString)) {
 			courses = courses.stream().filter(element -> element.isCourse()).limit(MAX).collect(Collectors.toList());
 		} else {
@@ -119,10 +122,18 @@ public class BDCourse {
 	public List<HHZEvent> listExams() throws Exception {
 		return this.mCalendarUtils.listEvents().stream().filter(element -> element.isCourse()
 				&& element.getType() != null && element.getType().toLowerCase().contains(SUFFIX_EXAM))
-				.collect(Collectors.toList());
+				.limit(2).collect(Collectors.toList());
 	}
 
 	public static BDCourse getInstance(Credential tocken) {
+		if (mBDCourse != null) {
+			return mBDCourse;
+		}
+		mBDCourse = new BDCourse(tocken);
+		return mBDCourse;
+	}
+	
+	public static BDCourse getInstance(String tocken) {
 		if (mBDCourse != null) {
 			return mBDCourse;
 		}

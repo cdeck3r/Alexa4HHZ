@@ -9,6 +9,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.Strings;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
@@ -19,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.apache.http.auth.Credentials;
 
@@ -30,12 +33,17 @@ public class CalendarUtils {
 	private static final String CANCELLED = "cancelled";
 	private static final String DBE_PREFIX = "DBE";
 	private static final String SCM_PREFIX = "SCM";
-	private Credential accesTocken;
+	private Credential credential;
+	private String accessTocken;
 	List<HHZEvent> eventList = new ArrayList<HHZEvent>();
 	List<HHZEvent> modifiedEvents = new ArrayList<HHZEvent>();
 
 	public CalendarUtils(final Credential acessTocken) {
-		this.accesTocken = acessTocken;
+		this.credential = acessTocken;
+	}
+
+	public CalendarUtils(final String acessTocken) {
+		this.accessTocken = acessTocken;
 	}
 
 	public List<HHZEvent> listEvents() throws Exception {
@@ -48,16 +56,20 @@ public class CalendarUtils {
 
 		DateTime now = new DateTime(System.currentTimeMillis());
 		Events events = null;
-		HashMap<String, String> savedEvents = DataSourceFactory.getInstance().loadEvents();
+		List<HHZEvent> savedEvents = DataSourceFactory.getInstance().loadEvents();
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-
-//		GoogleCredential credential = new GoogleCredential().setAccessToken(this.accesTocken);
-		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, this.accesTocken)
-				.setApplicationName(APPLICATION_NAME).build();
+		Calendar service;
+		if (!Strings.isNullOrEmpty(this.accessTocken)) {
+			GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
+			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
+					.setApplicationName(APPLICATION_NAME).build();
+		} else {
+			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, this.credential)
+					.setApplicationName(APPLICATION_NAME).build();
+		}
 		events = service.events().list("primary").setTimeMin(now).
 //				setCalendarId(HHZ_CALENDAR).
-				setOrderBy("startTime")
-				.setSingleEvents(true).execute();
+				setOrderBy("startTime").setSingleEvents(true).execute();
 		List<Event> items = events.getItems();
 		if (!items.isEmpty()) {
 			for (Event event : items) {
@@ -65,7 +77,10 @@ public class CalendarUtils {
 				if (course != null) {
 
 					this.eventList.add(course);
-					if (!savedEvents.containsKey(event.getId())) {
+					List<HHZEvent> uniqueEvent = savedEvents.stream()
+							.filter(element -> element.getId().equals(event.getId())).collect(Collectors.toList());
+					if (uniqueEvent == null || uniqueEvent.size() <= 0) {
+						// event not saved in database
 						eventsToAdd.add(course);
 					}
 				}
@@ -78,10 +93,10 @@ public class CalendarUtils {
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
 
-		if (this.modifiedEvents.size() > 0) {
-			return modifiedEvents;
-		}
-		HashMap<String, String> ids = DataSourceFactory.getInstance().loadEvents();
+//		if (this.modifiedEvents.size() > 0) {
+//			return modifiedEvents;
+//		}
+		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents();
 		if (ids.size() <= 0) {
 			return new ArrayList<HHZEvent>();
 		}
@@ -90,24 +105,34 @@ public class CalendarUtils {
 		modifiedEvents = new ArrayList<HHZEvent>();
 		Event event = null;
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-//		GoogleCredential credential = new GoogleCredential().setAccessToken(this.accesTocken);
-		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, accesTocken)
-				.setApplicationName(APPLICATION_NAME).build();
-		for (String eventId : ids.keySet()) {
-			counter++;
+		Calendar service;
+		if (!Strings.isNullOrEmpty(accessTocken)) {
+			GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
+			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
+					.setApplicationName(APPLICATION_NAME).build();
+		} else {
+			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, this.credential)
+					.setApplicationName(APPLICATION_NAME).build();
+		}
+		for (HHZEvent ev : ids) {
 			if (counter >= limit) {
 				break;
 			}
-			Calendar.Events.Get getRequest = service.events().get("primary", eventId);
-			getRequest.setRequestHeaders(new HttpHeaders().setIfNoneMatch(ids.get(eventId)));
+			counter++;
+			Calendar.Events.Get getRequest = service.events().get("primary", ev.getId());
+			getRequest.setRequestHeaders(new HttpHeaders().setIfNoneMatch(ev.geteTag()));
 
 			try {
 				event = getRequest.execute();
+
 			} catch (GoogleJsonResponseException e) {
 				continue;
 			}
 			HHZEvent course = this.createEvent(event);
 			if (course != null) {
+				if (!course.isCancelled() && course.getStartTime().after(ev.getStartTime())) {
+					course.setPosponed(true);
+				}
 				modifiedEvents.add(course);
 				DataSourceFactory.getInstance().updateEvent(course);
 			}
@@ -155,9 +180,9 @@ public class CalendarUtils {
 			description = summaryArray[0];
 		}
 		HHZEvent course = new HHZEvent(description, teacher, semester, new Date(start.getValue()), event.getLocation(),
-				event.getId(), event.getId());
+				event.getId(), event.getEtag());
 		course.setCourse(isCourse);
-		course.setCancelled(event.getStatus() == CANCELLED);
+		course.setCancelled(event.getStatus().equals(CANCELLED));
 		course.setType(type);
 
 		return course;

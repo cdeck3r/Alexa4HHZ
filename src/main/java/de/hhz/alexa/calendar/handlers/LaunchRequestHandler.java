@@ -24,6 +24,7 @@ import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,19 +51,20 @@ public class LaunchRequestHandler implements RequestHandler {
 		try {
 			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
 			if (myCourse != null & myCourse.size() > 0) {
-				mStringBuilder.append("Deine Vorlesung wurde verschoben.");
+				myCourse = this.removeDuplicate(myCourse);
 				myCourse.forEach(element -> {
-					String dateString = Utils.parseDate(element.getStartTime());
-					mStringBuilder.append("am ");
-					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
-					mStringBuilder.append(" um ");
-					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ");
+					mStringBuilder.append("Achtung die Veranstaltung ");
 					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
-					mStringBuilder.append(",");
+					if (element.isCancelled()) {
+						mStringBuilder.append(" ist ausgefallen.");
+					} else if (element.isPosponed()) {
+						mStringBuilder.append(" wurde verschoben. Neue Uhrzeit:");
+						String dateString = Utils.parseDate(element.getStartTime());
+						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
+						mStringBuilder.append(" ");
+						mStringBuilder.append(dateString.split(",")[1]);
+						mStringBuilder.append(".");
+					}
 				});
 				mStringBuilder.append("</speak>");
 
@@ -79,4 +81,13 @@ public class LaunchRequestHandler implements RequestHandler {
 				.withReprompt("Sag z.B. Vorlesung").build();
 	}
 
+	private List<HHZEvent> removeDuplicate(List<HHZEvent> eventList) {
+		List<HHZEvent> myList = new ArrayList<HHZEvent>();
+		for (HHZEvent e : eventList) {
+			if (!myList.contains(e)) {
+				myList.add(e);
+			}
+		}
+		return myList;
+	}
 }
