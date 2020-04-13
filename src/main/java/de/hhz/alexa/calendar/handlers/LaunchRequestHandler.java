@@ -40,7 +40,7 @@ public class LaunchRequestHandler implements RequestHandler {
 	@Override // geänderte events in datenbank speichern und als notification melden.
 				// notification erst nach bestätigung löschen.
 	public Optional<Response> handle(HandlerInput input) {
-		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu deinen Vorlesungen fragen. Sag z.B. Vorlesung.";
+		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung.";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
@@ -53,7 +53,7 @@ public class LaunchRequestHandler implements RequestHandler {
 			if (myCourse != null & myCourse.size() > 0) {
 				myCourse = this.removeDuplicate(myCourse);
 				myCourse.forEach(element -> {
-					mStringBuilder.append("Achtung die Veranstaltung ");
+					mStringBuilder.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom Herman Hollerith Zentrum. Die Veranstaltung ");
 					mStringBuilder.append(element.getDescription());
 					if (element.isCancelled()) {
 						mStringBuilder.append(" ist ausgefallen.");
@@ -64,6 +64,7 @@ public class LaunchRequestHandler implements RequestHandler {
 						mStringBuilder.append(" ");
 						mStringBuilder.append(dateString.split(",")[1]);
 						mStringBuilder.append(".");
+						mStringBuilder.append("Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung.");
 					}
 				});
 				mStringBuilder.append("</speak>");

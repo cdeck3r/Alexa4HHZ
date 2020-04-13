@@ -47,17 +47,17 @@ public class DataSourceFactory {
 		DynamoDB dynamoDB = new DynamoDB(client);
 		this.table = dynamoDB.getTable(tableName);
 //		this.table.delete();
-//		List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>()7d;
-//		attributeDefinitions.add(new AttributeDefinition().withAttributeName("id").withAttributeType("S"));
-//
-//		List<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
-//		keySchema.add(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH));
-//
-//		CreateTableRequest request = new CreateTableRequest().withTableName(tableName).withKeySchema(keySchema)
-//				.withAttributeDefinitions(attributeDefinitions).withProvisionedThroughput(
-//						new ProvisionedThroughput().withReadCapacityUnits(5L).withWriteCapacityUnits(5L));
-//		TableUtils.createTableIfNotExists(client, request);
-//		this.table.waitForActive();
+		List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+		attributeDefinitions.add(new AttributeDefinition().withAttributeName("id").withAttributeType("S"));
+
+		List<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
+		keySchema.add(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH));
+
+		CreateTableRequest request = new CreateTableRequest().withTableName(tableName).withKeySchema(keySchema)
+				.withAttributeDefinitions(attributeDefinitions).withProvisionedThroughput(
+						new ProvisionedThroughput().withReadCapacityUnits(5L).withWriteCapacityUnits(5L));
+		TableUtils.createTableIfNotExists(client, request);
+		this.table.waitForActive();
 	}
 
 	public void saveEvents(List<HHZEvent> courses) {
