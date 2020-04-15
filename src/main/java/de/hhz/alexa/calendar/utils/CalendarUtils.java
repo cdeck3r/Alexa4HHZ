@@ -14,13 +14,10 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import de.hhz.alexa.calendar.datasource.DataSourceFactory;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.http.auth.Credentials;
@@ -92,17 +89,14 @@ public class CalendarUtils {
 	}
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
+		modifiedEvents = new ArrayList<HHZEvent>();
 
-//		if (this.modifiedEvents.size() > 0) {
-//			return modifiedEvents;
-//		}
 		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents();
 		if (ids.size() <= 0) {
-			return new ArrayList<HHZEvent>();
+			return modifiedEvents;
 		}
 		int limit = ids.size() > 5 ? 5 : ids.size();
 		int counter = 0;
-		modifiedEvents = new ArrayList<HHZEvent>();
 		Event event = null;
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 		Calendar service;
@@ -114,6 +108,7 @@ public class CalendarUtils {
 			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, this.credential)
 					.setApplicationName(APPLICATION_NAME).build();
 		}
+
 		for (HHZEvent ev : ids) {
 			if (counter >= limit) {
 				break;
@@ -121,7 +116,6 @@ public class CalendarUtils {
 			counter++;
 			Calendar.Events.Get getRequest = service.events().get("primary", ev.getId());
 			getRequest.setRequestHeaders(new HttpHeaders().setIfNoneMatch(ev.geteTag()));
-
 			try {
 				event = getRequest.execute();
 

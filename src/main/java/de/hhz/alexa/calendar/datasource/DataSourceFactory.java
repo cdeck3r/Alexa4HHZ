@@ -99,10 +99,10 @@ public class DataSourceFactory {
 
 	public List<HHZEvent> loadEvents() throws Exception {
 		List<HHZEvent> eventList = new ArrayList<HHZEvent>();
-		HHZEvent event = new HHZEvent();
 		ScanRequest scanRequest = new ScanRequest().withTableName(this.tableName);
 		ScanResult result = this.client.scan(scanRequest);
 		for (Map<String, AttributeValue> item : result.getItems()) {
+			HHZEvent event = new HHZEvent();
 			event.setId(item.get("id").getS());
 			event.seteTag(item.get("eTag").getS());
 			event.setStartTime(new Date(Long.parseLong(item.get("startTime").getS())));

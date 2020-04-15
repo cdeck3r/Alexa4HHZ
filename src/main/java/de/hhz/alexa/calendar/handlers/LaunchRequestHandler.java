@@ -50,10 +50,9 @@ public class LaunchRequestHandler implements RequestHandler {
 		mStringBuilder.append("<speak>");
 		try {
 			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
-			if (myCourse != null & myCourse.size() > 0) {
-				myCourse = this.removeDuplicate(myCourse);
+			if (myCourse.size() > 0) {
 				myCourse.forEach(element -> {
-					mStringBuilder.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom Herman Hollerith Zentrum. Die Veranstaltung ");
+					mStringBuilder.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
 					mStringBuilder.append(element.getDescription());
 					if (element.isCancelled()) {
 						mStringBuilder.append(" ist ausgefallen.");
@@ -63,9 +62,7 @@ public class LaunchRequestHandler implements RequestHandler {
 						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 						mStringBuilder.append(" ");
 						mStringBuilder.append(dateString.split(",")[1]);
-						mStringBuilder.append(".");
-						mStringBuilder.append("Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung.");
-					}
+						mStringBuilder.append(".");					}
 				});
 				mStringBuilder.append("</speak>");
 
