@@ -79,6 +79,10 @@ public class CalendarUtils {
 					if (uniqueEvent == null || uniqueEvent.size() <= 0) {
 						// event not saved in database
 						eventsToAdd.add(course);
+					} else {
+						if (uniqueEvent.get(0).getStartTime().before(new Date())) {
+							DataSourceFactory.getInstance().deleteEvent(uniqueEvent.get(0));
+						}
 					}
 				}
 

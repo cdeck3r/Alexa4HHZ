@@ -44,20 +44,20 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 				mStringBuilder.append("Es gibt keine Vorlesung von ");
 				mStringBuilder.append(optionalTeacher.get());
 			} else {
-				mStringBuilder.append("Die nächste Vorlesung von ");
+				mStringBuilder.append("Die nächste Vorlesungen von ");
 				mStringBuilder.append(optionalTeacher.get());
-				mStringBuilder.append(" ist am ");
+				mStringBuilder.append(" sind:");
+
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
-					mStringBuilder.append(" um ");
+					mStringBuilder.append(" ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation());
-					mStringBuilder.append(" . ");
+					mStringBuilder.append(Utils.getLocation(element.getLocation()));
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {

@@ -36,7 +36,7 @@ public class ListExamIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listExams();
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Keine Prüfung gefunden");
+				mStringBuilder.append("Es gibt keine Prüfung");
 			} else {
 				mStringBuilder.append("Die nächste Prüfungen sind ");
 				myCourse.forEach(element -> {
@@ -47,9 +47,8 @@ public class ListExamIntentHandler implements RequestHandler {
 					mStringBuilder.append(" ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
-					mStringBuilder.append(" . ");
+					mStringBuilder.append(Utils.getLocation(element.getLocation()));
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {

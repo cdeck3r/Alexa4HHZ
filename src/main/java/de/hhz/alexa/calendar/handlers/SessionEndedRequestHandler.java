@@ -31,8 +31,7 @@ public class SessionEndedRequestHandler implements RequestHandler {
 
     @Override
     public Optional<Response> handle(HandlerInput input) {
-        // any cleanup logic goes here
-        return input.getResponseBuilder().build();
+        return input.getResponseBuilder().withSpeech("Bis bald").build();
     }
 
 }

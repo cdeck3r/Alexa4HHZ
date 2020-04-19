@@ -1,9 +1,7 @@
 package de.hhz.alexa.calendar.datasource;
 
-import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,8 +12,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
-import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
@@ -30,7 +26,6 @@ import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
-import com.fasterxml.jackson.core.JsonParseException;
 
 import de.hhz.alexa.calendar.utils.HHZEvent;
 

@@ -41,12 +41,11 @@ public class ListLectureIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listLectureByDate(optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Du hast ");
-				mStringBuilder.append(" ");
-				mStringBuilder.append("keine Vorlesung");
+				mStringBuilder.append("Es gibt keine Vorlesung ");
+				mStringBuilder.append(optionalDate.orElse(""));
 			} else {
-				mStringBuilder.append("Du hast ");
-				mStringBuilder.append("am ");
+				mStringBuilder.append("Nächste Vorlesung: ");
+
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
@@ -55,9 +54,8 @@ public class ListLectureIntentHandler implements RequestHandler {
 					mStringBuilder.append(" ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
-					mStringBuilder.append(" . ");
+					mStringBuilder.append(element.getLocation());
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {

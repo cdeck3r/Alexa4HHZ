@@ -34,18 +34,17 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
-		Optional<String> optionalSemester = requestHelper.getSlotValue("semester");
+		Optional<String> optionalSemester = requestHelper.getSlotValue("semesterNumber");
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listLectureBySemester(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Keine Vorlesung für das Semester");
+				mStringBuilder.append("Es gibt keine Vorlesung für das Semester");
 				mStringBuilder.append(optionalSemester.get());
-				mStringBuilder.append(" gefunden");
 			} else {
-				mStringBuilder.append("Die nächste Vorlesung von Semester");
+				mStringBuilder.append("Die nächste Vorlesungen vom Semester");
 				mStringBuilder.append(optionalSemester.get());
 				mStringBuilder.append(" sind:");
 				myCourse.forEach(element -> {
@@ -56,9 +55,8 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 					mStringBuilder.append(" ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
-					mStringBuilder.append(" . ");
+					mStringBuilder.append(Utils.getLocation(element.getLocation()));
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {

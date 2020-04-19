@@ -17,7 +17,6 @@ import com.amazon.ask.Skill;
 import com.amazon.ask.Skills;
 
 import de.hhz.alexa.calendar.handlers.CancelandStopIntentHandler;
-import de.hhz.alexa.calendar.handlers.FallbackIntentHandler;
 import de.hhz.alexa.calendar.handlers.HelpIntentHandler;
 import de.hhz.alexa.calendar.handlers.LaunchRequestHandler;
 import de.hhz.alexa.calendar.handlers.ListEventByNameIntentHandler;
@@ -43,7 +42,6 @@ public class CalendarStreamHandler extends SkillStreamHandler {
                         new HelpIntentHandler(),
                         new LaunchRequestHandler(),
                         new SessionEndedRequestHandler(),
-                        new FallbackIntentHandler(),
                         new ListLectureBySemesterIntentHandler(),
                         new ListLectureByTeacherIntentHandler(),
                         new ListEventByNameIntentHandler(),

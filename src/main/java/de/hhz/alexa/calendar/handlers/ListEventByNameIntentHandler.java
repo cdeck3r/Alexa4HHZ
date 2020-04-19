@@ -10,11 +10,8 @@ import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 import static com.amazon.ask.request.Predicates.intentName;
 
@@ -44,18 +41,17 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 				mStringBuilder.append("Es gibt kein Event mit dem Name ");
 				mStringBuilder.append(name.get());
 			} else {
-				mStringBuilder.append("am ");
+				mStringBuilder.append("Es gibt am ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" gibt es ");
+					mStringBuilder.append(" ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
-					mStringBuilder.append("in ");
-					mStringBuilder.append(element.getLocation());
-					mStringBuilder.append(" . ");
+					mStringBuilder.append(Utils.getLocation(element.getLocation()));
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {

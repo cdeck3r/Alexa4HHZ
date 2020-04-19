@@ -12,7 +12,6 @@ import de.hhz.alexa.calendar.utils.Utils;
 import java.util.List;
 import java.util.Optional;
 
-
 import static com.amazon.ask.request.Predicates.intentName;
 
 public class ListEventIntentHandler implements RequestHandler {
@@ -38,21 +37,19 @@ public class ListEventIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listEventByDate(optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt kein Event.");
+				mStringBuilder.append("Es gibt kein Event ");
 				mStringBuilder.append(optionalDate.orElse(""));
 			} else {
-				mStringBuilder.append("Das nächste Event ist ");
 				myCourse.forEach(element -> {
+					mStringBuilder.append("am ");
 					String dateString = Utils.parseDate(element.getStartTime());
-					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(" ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ");
-//					mStringBuilder.append("in ");
-//					mStringBuilder.append(element.getLocation().replaceAll("[(,)]", ""));
-					mStringBuilder.append(" . ");
+					mStringBuilder.append(" gibt es ");
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(Utils.getLocation(element.getLocation()));
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {
@@ -62,6 +59,5 @@ public class ListEventIntentHandler implements RequestHandler {
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
 				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
 	}
-
 
 }

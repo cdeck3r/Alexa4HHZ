@@ -23,8 +23,6 @@ import com.google.api.client.util.Strings;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +35,7 @@ public class LaunchRequestHandler implements RequestHandler {
 		return input.matches(requestType(LaunchRequest.class));
 	}
 
-	@Override // geänderte events in datenbank speichern und als notification melden.
-				// notification erst nach bestätigung löschen.
+	@Override 
 	public Optional<Response> handle(HandlerInput input) {
 		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung.";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
@@ -51,8 +48,8 @@ public class LaunchRequestHandler implements RequestHandler {
 		try {
 			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
 			if (myCourse.size() > 0) {
+				mStringBuilder.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
 				myCourse.forEach(element -> {
-					mStringBuilder.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
 					mStringBuilder.append(element.getDescription());
 					if (element.isCancelled()) {
 						mStringBuilder.append(" ist ausgefallen.");
@@ -65,7 +62,6 @@ public class LaunchRequestHandler implements RequestHandler {
 						mStringBuilder.append(".");					}
 				});
 				mStringBuilder.append("</speak>");
-
 				speechText = mStringBuilder.toString();
 			}
 		} catch (Exception e) {
@@ -77,15 +73,5 @@ public class LaunchRequestHandler implements RequestHandler {
 
 		return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText)
 				.withReprompt("Sag z.B. Vorlesung").build();
-	}
-
-	private List<HHZEvent> removeDuplicate(List<HHZEvent> eventList) {
-		List<HHZEvent> myList = new ArrayList<HHZEvent>();
-		for (HHZEvent e : eventList) {
-			if (!myList.contains(e)) {
-				myList.add(e);
-			}
-		}
-		return myList;
 	}
 }

@@ -36,7 +36,7 @@ public class BDCourse {
 	@SuppressWarnings("deprecation")
 	public List<HHZEvent> listLectureByDate(final String dateString) throws Exception {
 		List<HHZEvent> courses = mCalendarUtils.listEvents();
-		int MAX = 100;
+		int MAX = 2;
 		if (Strings.isNullOrEmpty(dateString)) {
 			courses = courses.stream().filter(element -> element.isCourse()).limit(MAX).collect(Collectors.toList());
 		} else {
@@ -110,7 +110,7 @@ public class BDCourse {
 	 */
 	public List<HHZEvent> listLectureBySemester(String semester) throws Exception {
 		return this.mCalendarUtils.listEvents().stream()
-				.filter(element -> element.isCourse() && element.getSemester().contains(semester)).limit(4)
+				.filter(element -> element.isCourse() && element.getSemester().contains(semester)).limit(2)
 				.collect(Collectors.toList());
 	}
 
