@@ -46,7 +46,7 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 			} else {
 				mStringBuilder.append("Die nächste Vorlesungen von ");
 				mStringBuilder.append(optionalTeacher.get());
-				mStringBuilder.append(" sind:");
+				mStringBuilder.append(" ist am ");
 
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
@@ -64,8 +64,8 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Vorlesung",mStringBuilder.toString())
+				.build();
 	}
 
 

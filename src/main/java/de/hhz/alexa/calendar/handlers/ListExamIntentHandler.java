@@ -36,27 +36,27 @@ public class ListExamIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listExams();
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Prüfung");
+				mStringBuilder.append("Es gibt keine Prüfung.");
 			} else {
-				mStringBuilder.append("Die nächste Prüfungen sind ");
+				mStringBuilder.append("Die nächste Prüfung ist ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(" am ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");
-					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(" ");
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
-					mStringBuilder.append(".");
+					mStringBuilder.append(". ");
 				});
 			}
 		} catch (Exception e) {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Prüfung", mStringBuilder.toString()).build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Prüfung","Hallo du")
+				.build();
 	}
 
 

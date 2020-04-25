@@ -23,8 +23,11 @@ public class BDCourse {
 	private BDCourse(final String accessTocken) {
 		this.mCalendarUtils = new CalendarUtils(accessTocken);
 	}
+
 	public List<HHZEvent> listLecturesByTeacher(final String teachter) throws Exception {
-		String myTeacher = teachter.split(" ").length > 1 ? teachter.split(" ")[1] : teachter;
+		String[] myTeacherArray = teachter.split(" ");
+		String myTeacher = myTeacherArray.length > 1 ? myTeacherArray[myTeacherArray.length - 1] : teachter;
+
 		return this.mCalendarUtils.listEvents().stream().filter(
 				element -> element.isCourse() && element.getTeacher().toLowerCase().contains(myTeacher.toLowerCase()))
 				.limit(1).collect(Collectors.toList());
@@ -36,9 +39,8 @@ public class BDCourse {
 	@SuppressWarnings("deprecation")
 	public List<HHZEvent> listLectureByDate(final String dateString) throws Exception {
 		List<HHZEvent> courses = mCalendarUtils.listEvents();
-		int MAX = 2;
 		if (Strings.isNullOrEmpty(dateString)) {
-			courses = courses.stream().filter(element -> element.isCourse()).limit(MAX).collect(Collectors.toList());
+			courses = courses.stream().filter(element -> element.isCourse()).limit(1).collect(Collectors.toList());
 		} else {
 			courses = courses.stream()
 					.filter(element -> element.isCourse() && filterByDate(dateString, element.getStartTime()))
@@ -64,23 +66,6 @@ public class BDCourse {
 		return courses.stream()
 				.filter(element -> !element.isCourse() && filterByDate(dateString, element.getStartTime())).limit(1)
 				.collect(Collectors.toList());
-	}
-
-	@SuppressWarnings("deprecation")
-	private boolean filterByDate(final String dateString, final Date dateToCompare) {
-		String[] dateArray = dateString.split("-");
-		if (dateArray.length == 3 && !dateArray[1].startsWith(KW)) {
-			int year = Integer.parseInt(dateArray[0]);
-			int month = Integer.parseInt(dateArray[1]);
-			int day = Integer.parseInt(dateArray[2]);
-			return dateToCompare.getDate() == day && (dateToCompare.getMonth() + 1 == month)
-					&& (dateToCompare.getYear() + 1900 == year);
-		} else if (dateArray.length == 2 && dateArray[1].startsWith(KW)) {
-			Calendar mCalendar = Calendar.getInstance();
-			mCalendar.setTime(dateToCompare);
-			return mCalendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(dateArray[1].replaceAll(KW, ""));
-		}
-		return false;
 	}
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
@@ -110,7 +95,7 @@ public class BDCourse {
 	 */
 	public List<HHZEvent> listLectureBySemester(String semester) throws Exception {
 		return this.mCalendarUtils.listEvents().stream()
-				.filter(element -> element.isCourse() && element.getSemester().contains(semester)).limit(2)
+				.filter(element -> element.isCourse() && element.getSemester().contains(semester)).limit(1)
 				.collect(Collectors.toList());
 	}
 
@@ -121,8 +106,25 @@ public class BDCourse {
 	 */
 	public List<HHZEvent> listExams() throws Exception {
 		return this.mCalendarUtils.listEvents().stream().filter(element -> element.isCourse()
-				&& element.getType() != null && element.getType().toLowerCase().contains(SUFFIX_EXAM))
-				.limit(2).collect(Collectors.toList());
+				&& element.getType() != null && element.getType().toLowerCase().contains(SUFFIX_EXAM)).limit(1)
+				.collect(Collectors.toList());
+	}
+
+	@SuppressWarnings("deprecation")
+	private boolean filterByDate(final String dateString, final Date dateToCompare) {
+		String[] dateArray = dateString.split("-");
+		if (dateArray.length == 3 && !dateArray[1].startsWith(KW)) {
+			int year = Integer.parseInt(dateArray[0]);
+			int month = Integer.parseInt(dateArray[1]);
+			int day = Integer.parseInt(dateArray[2]);
+			return dateToCompare.getDate() == day && (dateToCompare.getMonth() + 1 == month)
+					&& (dateToCompare.getYear() + 1900 == year);
+		} else if (dateArray.length == 2 && dateArray[1].startsWith(KW)) {
+			Calendar mCalendar = Calendar.getInstance();
+			mCalendar.setTime(dateToCompare);
+			return mCalendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(dateArray[1].replaceAll(KW, ""));
+		}
+		return false;
 	}
 
 	public static BDCourse getInstance(Credential tocken) {
@@ -132,7 +134,7 @@ public class BDCourse {
 		mBDCourse = new BDCourse(tocken);
 		return mBDCourse;
 	}
-	
+
 	public static BDCourse getInstance(String tocken) {
 		if (mBDCourse != null) {
 			return mBDCourse;

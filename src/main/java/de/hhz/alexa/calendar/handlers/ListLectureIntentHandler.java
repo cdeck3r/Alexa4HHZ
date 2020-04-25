@@ -44,26 +44,29 @@ public class ListLectureIntentHandler implements RequestHandler {
 				mStringBuilder.append("Es gibt keine Vorlesung ");
 				mStringBuilder.append(optionalDate.orElse(""));
 			} else {
-				mStringBuilder.append("Nächste Vorlesung: ");
-
+                if(optionalDate.isEmpty()) {
+                	mStringBuilder.append("Die nächste Vorlesung ist ");
+                } else {
+                	mStringBuilder.append("Es gibt ");
+                }
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(" am ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");
-					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(" ");
-					mStringBuilder.append(element.getLocation());
-					mStringBuilder.append(".");
+					mStringBuilder.append(Utils.getLocation(element.getLocation()));
+					mStringBuilder.append(". ");
 				});
 			}
 		} catch (Exception e) {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Vorlesung",mStringBuilder.toString())
+				.build();
 	}
 
 }

@@ -30,10 +30,15 @@ public class HelpIntentHandler implements RequestHandler {
 
     @Override
     public Optional<Response> handle(HandlerInput input) {
-        String speechText = "You can say hello to me!";
+        String speechText = "Du kannst mir folgende Fragen stellen: Was ist nächste Vorlesung, "
+        		+ "Wann ist die nächste Vorlesung von z.B. Herr Professor Decker, "
+        		+ "Wann gibt es die nächste Vorlesung von Semester 2, "
+        		+ "Wann findet die nächste Prüfung statt, "
+        		+ "Wann findet z.B. Artificial Intelligence statt, "
+        		+ "Was ist das nächste Event.";
         return input.getResponseBuilder()
                 .withSpeech(speechText)
-                .withSimpleCard("HelloWorld", speechText)
+                .withSimpleCard("hilfe", speechText)
                 .withReprompt(speechText)
                 .build();
     }

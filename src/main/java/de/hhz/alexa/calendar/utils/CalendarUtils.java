@@ -65,7 +65,7 @@ public class CalendarUtils {
 					.setApplicationName(APPLICATION_NAME).build();
 		}
 		events = service.events().list("primary").setTimeMin(now).
-//				setCalendarId(HHZ_CALENDAR).
+				setCalendarId(HHZ_CALENDAR).
 				setOrderBy("startTime").setSingleEvents(true).execute();
 		List<Event> items = events.getItems();
 		if (!items.isEmpty()) {
@@ -99,7 +99,7 @@ public class CalendarUtils {
 		if (ids.size() <= 0) {
 			return modifiedEvents;
 		}
-		int limit = ids.size() > 5 ? 5 : ids.size();
+		int limit = ids.size() > 10 ? 10 : ids.size();
 		int counter = 0;
 		Event event = null;
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();

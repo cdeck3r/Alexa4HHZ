@@ -41,13 +41,13 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 				mStringBuilder.append("Es gibt kein Event mit dem Name ");
 				mStringBuilder.append(name.get());
 			} else {
-				mStringBuilder.append("Es gibt am ");
+				mStringBuilder.append("am ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ");
+					mStringBuilder.append(" gibt es ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
@@ -58,8 +58,8 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withSimpleCard("Vorlesung", mStringBuilder.toString()).build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Veranstaltung",mStringBuilder.toString())
+				.build();
 	}
 
 

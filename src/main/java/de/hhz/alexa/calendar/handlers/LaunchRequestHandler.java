@@ -37,7 +37,7 @@ public class LaunchRequestHandler implements RequestHandler {
 
 	@Override 
 	public Optional<Response> handle(HandlerInput input) {
-		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung.";
+		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung oder Hilfe.";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
@@ -71,7 +71,7 @@ public class LaunchRequestHandler implements RequestHandler {
 
 		}
 
-		return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText)
+		return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("vorlesung", speechText)
 				.withReprompt("Sag z.B. Vorlesung").build();
 	}
 }
