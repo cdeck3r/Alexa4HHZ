@@ -35,12 +35,13 @@ public class LaunchRequestHandler implements RequestHandler {
 		return input.matches(requestType(LaunchRequest.class));
 	}
 
-	@Override 
+	@Override
 	public Optional<Response> handle(HandlerInput input) {
 		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung oder Hilfe.";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
+			return input.getResponseBuilder().withSpeech(speechText).withLinkAccountCard().build();
 		}
 		List<HHZEvent> myCourse = null;
 		StringBuilder mStringBuilder = new StringBuilder();
@@ -48,7 +49,8 @@ public class LaunchRequestHandler implements RequestHandler {
 		try {
 			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
 			if (myCourse.size() > 0) {
-				mStringBuilder.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
+				mStringBuilder
+						.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
 				myCourse.forEach(element -> {
 					mStringBuilder.append(element.getDescription());
 					if (element.isCancelled()) {
@@ -59,7 +61,8 @@ public class LaunchRequestHandler implements RequestHandler {
 						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 						mStringBuilder.append(" ");
 						mStringBuilder.append(dateString.split(",")[1]);
-						mStringBuilder.append(".");					}
+						mStringBuilder.append(".");
+					}
 				});
 				mStringBuilder.append("</speak>");
 				speechText = mStringBuilder.toString();
@@ -71,7 +74,6 @@ public class LaunchRequestHandler implements RequestHandler {
 
 		}
 
-		return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("vorlesung", speechText)
-				.withReprompt("Sag z.B. Vorlesung").build();
+		return input.getResponseBuilder().withSpeech(speechText).withReprompt("Sag Vorlesung oder Hilfe").build();
 	}
 }

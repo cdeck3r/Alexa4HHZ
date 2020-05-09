@@ -63,7 +63,8 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Vorlesung",mStringBuilder.toString())
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withShouldEndSession(false)
 				.build();
 	}
 

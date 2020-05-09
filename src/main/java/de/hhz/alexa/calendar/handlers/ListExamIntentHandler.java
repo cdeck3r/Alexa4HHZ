@@ -55,7 +55,8 @@ public class ListExamIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Prüfung","Hallo du")
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withShouldEndSession(false)
 				.build();
 	}
 

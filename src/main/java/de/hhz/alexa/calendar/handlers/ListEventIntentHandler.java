@@ -58,7 +58,8 @@ public class ListEventIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withSimpleCard("Veranstaltung",mStringBuilder.toString())
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withShouldEndSession(false)
 				.build();
 	}
 
