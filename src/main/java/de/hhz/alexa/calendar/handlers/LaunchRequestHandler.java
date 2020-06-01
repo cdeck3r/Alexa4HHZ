@@ -37,7 +37,7 @@ public class LaunchRequestHandler implements RequestHandler {
 
 	@Override
 	public Optional<Response> handle(HandlerInput input) {
-		String speechText = "Willkommen zu HHZ Studienkalendar. Du kannst Informationen zu Vorlesungen fragen. Sag z.B. Vorlesung oder Hilfe.";
+		String speechText = "HHZ Studienkalendar geöffnet.";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
@@ -50,7 +50,7 @@ public class LaunchRequestHandler implements RequestHandler {
 			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
 			if (myCourse.size() > 0) {
 				mStringBuilder
-						.append("Willkommen zu HHZ Studienkalendar. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
+						.append("HHZ Studienkalendar geöffnet. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");
 				myCourse.forEach(element -> {
 					mStringBuilder.append(element.getDescription());
 					if (element.isCancelled()) {
@@ -74,6 +74,6 @@ public class LaunchRequestHandler implements RequestHandler {
 
 		}
 
-		return input.getResponseBuilder().withSpeech(speechText).withReprompt("Sag Vorlesung oder Hilfe").build();
+		return input.getResponseBuilder().withSpeech(speechText).withReprompt("Sag z.B. Vorlesung").build();
 	}
 }

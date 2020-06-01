@@ -56,7 +56,6 @@ public class ListExamIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withShouldEndSession(false)
 				.build();
 	}
 

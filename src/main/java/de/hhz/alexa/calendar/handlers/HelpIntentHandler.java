@@ -30,15 +30,16 @@ public class HelpIntentHandler implements RequestHandler {
 
     @Override
     public Optional<Response> handle(HandlerInput input) {
-        String speechText = "Du kannst mir folgende Fragen stellen: Was ist die nächste Vorlesung. "
-        		+ "Wann ist die nächste Vorlesung von z.B. Herr Professor Decker. "
-        		+ "Wann findet die nächste Prüfung statt. "
-        		+ "Wann findet z.B. der Projekttag statt. "
-        		+ "Was ist das nächste Event. "
-        		+ "Wann gibt es die nächste Vorlesung von Semester z.B. 3 ";
+        String speechText = "Du kannst mir folgende Fragen stellen: Was ist die nächste Vorlesung? "
+        		+ "Wann ist die nächste Vorlesung von z.B. Herr Professor Decker? "
+        		+ "Wann findet die nächste Prüfung statt? "
+        		+ "Wann findet z.B. der Projekttag statt? "
+        		+ "Was ist das nächste Event? "
+        		+ "Wann gibt es die nächste Vorlesung von Semester z.B. 3?";
 
         return input.getResponseBuilder()
                 .withSpeech(speechText)
+                .withReprompt(speechText)
                 .build();
     }
 }

@@ -10,11 +10,8 @@ import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 import static com.amazon.ask.request.Predicates.intentName;
 
@@ -65,7 +62,7 @@ public class ListLectureIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withShouldEndSession(false)
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
 				.build();
 	}
 
