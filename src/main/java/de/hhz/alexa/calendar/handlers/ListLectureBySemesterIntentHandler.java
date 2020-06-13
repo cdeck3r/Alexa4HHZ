@@ -12,7 +12,9 @@ import de.hhz.alexa.calendar.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -20,7 +22,12 @@ import static com.amazon.ask.request.Predicates.intentName;
 
 public class ListLectureBySemesterIntentHandler implements RequestHandler {
 	private StringBuilder mStringBuilder;
-
+    private final Map<String, String> ORDINAL = new HashMap<String, String>(){{
+    	put("1", "ersten");
+    	put("2", "zweiten");
+    	put("3", "dritten");
+    	put("4", "vierten");
+    }};
 	@Override
 	public boolean canHandle(HandlerInput input) {
 		return input.matches(intentName("ListLectureBySemesterIntent"));
@@ -41,12 +48,12 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listLectureBySemester(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Vorlesung von Semester");
-				mStringBuilder.append(optionalSemester.get());
+				mStringBuilder.append("Es gibt keine Vorlesung für das Semester ");
+				mStringBuilder.append(optionalSemester.orElse(""));
 			} else {
-				mStringBuilder.append("Die nächste Vorlesung von Semester");
-				mStringBuilder.append(optionalSemester.get());
-				mStringBuilder.append(" ist ");
+				mStringBuilder.append("Die nächste Vorlesung des ");
+				mStringBuilder.append(ORDINAL.get(optionalSemester.get()));
+				mStringBuilder.append(" Semesters ist ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append(element.getDescription());
@@ -64,6 +71,7 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withReprompt(Utils.REPROMT)
 				.build();
 	}
 

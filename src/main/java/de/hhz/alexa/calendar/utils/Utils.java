@@ -2,13 +2,13 @@ package de.hhz.alexa.calendar.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import com.google.api.client.util.Strings;
 
 public class Utils {
 	private static final String ONLINE = "online";
+	public static final String REPROMT = "Was möchtest du noch erfahren?";
 
 	public static String parseDate(final Date date) {
 		SimpleDateFormat sdf;

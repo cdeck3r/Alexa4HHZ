@@ -38,7 +38,7 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listEventByName(name.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt kein Event mit dem Name ");
+				mStringBuilder.append("Es gibt keine Veranstaltung mit dem Name ");
 				mStringBuilder.append(name.get());
 			} else {
 				mStringBuilder.append("am ");
@@ -47,11 +47,15 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" gibt es ");
+					mStringBuilder.append(" ist ");
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
-					mStringBuilder.append(".");
+					if (element.isCourse()) {
+						mStringBuilder.append(" beim Professor ");
+						mStringBuilder.append(element.getTeacher().split(".")[1]);
+					}
+					mStringBuilder.append(". ");
 				});
 			}
 		} catch (Exception e) {
@@ -59,6 +63,7 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withReprompt(Utils.REPROMT)
 				.build();
 	}
 

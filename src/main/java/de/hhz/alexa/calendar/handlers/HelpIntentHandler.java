@@ -23,23 +23,24 @@ import static com.amazon.ask.request.Predicates.intentName;
 
 public class HelpIntentHandler implements RequestHandler {
 
-    @Override
-    public boolean canHandle(HandlerInput input) {
-        return input.matches(intentName("AMAZON.HelpIntent"));
-    }
+	@Override
+	public boolean canHandle(HandlerInput input) {
+		return input.matches(intentName("AMAZON.HelpIntent"));
+	}
 
-    @Override
-    public Optional<Response> handle(HandlerInput input) {
-        String speechText = "Du kannst mir folgende Fragen stellen: Was ist die nächste Vorlesung? "
-        		+ "Wann ist die nächste Vorlesung von z.B. Herr Professor Decker? "
-        		+ "Wann findet die nächste Prüfung statt? "
-        		+ "Wann findet z.B. der Projekttag statt? "
-        		+ "Was ist das nächste Event? "
-        		+ "Wann gibt es die nächste Vorlesung von Semester z.B. 3?";
+	@Override
+	public Optional<Response> handle(HandlerInput input) {
+		String speechText = "Du kannst mir folgende Fragen stellen: "
+				+ "Was steht alles morgen für z.B. das erste Semester an"
+				+ "Was steht alles an für z.B. heute, morgen, diese Woche, nächste Woche, nächsten Montag."
+				+ "Wann ist die nächste Vorlesung von z.B. Herr Decker? "
+				+ "Wann ist die nächste Vorlesung von Herr Decker für z.B. das erste semester? "
+				+ "Wann findet die nächste Prüfung statt? "
+				+ "Wann findet die nächste Prüfung im z.B. ersten semester statt? "
+				+ "Wann ist die nächste Vorlesung des z.B. dritten Semester? "
+				+ "Wann findet z.B. der Projekttag statt? ";
 
-        return input.getResponseBuilder()
-                .withSpeech(speechText)
-                .withReprompt(speechText)
-                .build();
-    }
+
+		return input.getResponseBuilder().withSpeech(speechText).withReprompt("was möchstest du wissen?").build();
+	}
 }

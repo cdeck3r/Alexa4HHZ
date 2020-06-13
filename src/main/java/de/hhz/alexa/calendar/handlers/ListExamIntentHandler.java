@@ -30,13 +30,18 @@ public class ListExamIntentHandler implements RequestHandler {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
+		Optional<String> optionalSemester = requestHelper.getSlotValue("semesterNumber");
+
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
-					.listExams();
+					.listExams(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Prüfung.");
+				mStringBuilder.append("Es gibt keine Prüfung ");
+				if(optionalSemester.isPresent()) {
+					mStringBuilder.append(" im semester ");
+					mStringBuilder.append(optionalSemester.get());}
 			} else {
 				mStringBuilder.append("Die nächste Prüfung ist ");
 				myCourse.forEach(element -> {
@@ -56,6 +61,7 @@ public class ListExamIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withReprompt(Utils.REPROMT)
 				.build();
 	}
 

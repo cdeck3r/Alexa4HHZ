@@ -31,26 +31,31 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
 		Optional<String> optionalTeacher = requestHelper.getSlotValue("teacher");
+		Optional<String> optionalSemester = requestHelper.getSlotValue("semesterNumber");
+
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
-					.listLecturesByTeacher(optionalTeacher.orElse(""));
+					.listLecturesByTeacher(optionalTeacher.orElse(""), optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Vorlesung von ");
+				mStringBuilder.append("Es gibt keine Vorlesung für ");
 				mStringBuilder.append(optionalTeacher.get());
+				if(optionalSemester.isPresent()) {
+					mStringBuilder.append(" im semester ");
+					mStringBuilder.append(optionalSemester.get());}
 			} else {
-				mStringBuilder.append("Die nächste Vorlesungen von ");
+				mStringBuilder.append("Die nächste Vorlesung von ");
 				mStringBuilder.append(optionalTeacher.get());
-				mStringBuilder.append(" ist am ");
+				mStringBuilder.append(" ist ");
 
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(" am ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ");
-					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
 					mStringBuilder.append(".");
@@ -61,6 +66,7 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 		}
 		mStringBuilder.append("</speak>");
 		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
+				.withReprompt(Utils.REPROMT)
 				.build();
 	}
 

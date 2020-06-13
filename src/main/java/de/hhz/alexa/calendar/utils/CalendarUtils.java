@@ -174,6 +174,8 @@ public class CalendarUtils {
 			if (summaryArray.length - 1 > 2) {
 				type = summaryArray[3];
 			}
+		} else if(event.getSummary().startsWith(DBE_PREFIX)) {
+			description = summaryArray[1];
 		} else {
 			description = summaryArray[0];
 		}
