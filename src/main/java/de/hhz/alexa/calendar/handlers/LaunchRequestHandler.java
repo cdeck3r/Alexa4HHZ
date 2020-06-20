@@ -37,7 +37,7 @@ public class LaunchRequestHandler implements RequestHandler {
 
 	@Override
 	public Optional<Response> handle(HandlerInput input) {
-		String speechText = "HHZ Studienkalendar geöffnet. Was möchstest du wissen?";
+		String speechText = "HHZ Studienkalendar geöffnet. Was möchstest du gern wissen?";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";

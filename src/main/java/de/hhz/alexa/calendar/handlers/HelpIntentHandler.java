@@ -41,6 +41,6 @@ public class HelpIntentHandler implements RequestHandler {
 				+ "Wann findet z.B. der Projekttag statt? ";
 
 
-		return input.getResponseBuilder().withSpeech(speechText).withReprompt("was möchstest du wissen?").build();
+		return input.getResponseBuilder().withSpeech(speechText).withReprompt("was möchstest gern du wissen?").build();
 	}
 }

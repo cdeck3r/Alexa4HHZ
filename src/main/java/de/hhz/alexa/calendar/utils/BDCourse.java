@@ -29,16 +29,21 @@ public class BDCourse {
 		String myTeacher = myTeacherArray.length > 1 ? myTeacherArray[myTeacherArray.length - 1] : teachter;
 		if (Strings.isNullOrEmpty(semester)) {
 			return this.mCalendarUtils.listEvents().stream()
-					.filter(element -> element.isCourse()
-							&& element.getTeacher().toLowerCase().contains(myTeacher.toLowerCase()))
+					.filter(element -> this.isNextEvent(element) && element.isCourse()
+							&& element.getOrganizer().toLowerCase().contains(myTeacher.toLowerCase()))
 					.limit(1).collect(Collectors.toList());
 		} else {
 			return this.mCalendarUtils.listEvents().stream()
-					.filter(element -> element.isCourse() && element.getSemester().contains(semester)
-							&& element.getTeacher().toLowerCase().contains(myTeacher.toLowerCase()))
+					.filter(element -> this.isNextEvent(element) && element.isCourse()
+							&& element.getSemester().contains(semester)
+							&& element.getOrganizer().toLowerCase().contains(myTeacher.toLowerCase()))
 					.limit(1).collect(Collectors.toList());
 		}
 
+	}
+
+	public boolean isNextEvent(HHZEvent event) {
+		return event.getStartTime().after(new Date());
 	}
 
 	/**
@@ -73,11 +78,11 @@ public class BDCourse {
 	public List<HHZEvent> listEventByDate(final String dateString) throws Exception {
 		List<HHZEvent> courses = mCalendarUtils.listEvents();
 		if (Strings.isNullOrEmpty(dateString)) {
-			return courses.stream().filter(element -> !element.isCourse()).limit(1).collect(Collectors.toList());
+			return courses.stream().filter(element -> isNextEvent(element) && !element.isCourse()).limit(1)
+					.collect(Collectors.toList());
 		}
-		return courses.stream()
-				.filter(element -> !element.isCourse() && filterByDate(dateString, element.getStartTime())).limit(1)
-				.collect(Collectors.toList());
+		return courses.stream().filter(element -> isNextEvent(element) && !element.isCourse()
+				&& filterByDate(dateString, element.getStartTime())).limit(1).collect(Collectors.toList());
 	}
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
@@ -106,9 +111,9 @@ public class BDCourse {
 	 * @throws Exception
 	 */
 	public List<HHZEvent> listLectureBySemester(String semester) throws Exception {
-		return this.mCalendarUtils.listEvents().stream()
-				.filter(element -> element.isCourse() && element.getSemester().contains(semester)).limit(1)
-				.collect(Collectors.toList());
+		return this.mCalendarUtils.listEvents().stream().filter(
+				element -> isNextEvent(element) && element.isCourse() && element.getSemester().contains(semester))
+				.limit(1).collect(Collectors.toList());
 	}
 
 	/**
@@ -119,12 +124,12 @@ public class BDCourse {
 	public List<HHZEvent> listExams(final String semester) throws Exception {
 		if (Strings.isNullOrEmpty(semester)) {
 			return this.mCalendarUtils.listEvents().stream()
-					.filter(element -> element.isCourse() && element.getType() != null
+					.filter(element -> isNextEvent(element) && element.isCourse() && element.getType() != null
 							&& element.getType().toLowerCase().contains(SUFFIX_EXAM))
 					.limit(1).collect(Collectors.toList());
 		} else {
 			return this.mCalendarUtils.listEvents().stream()
-					.filter(element -> element.isCourse() && element.getType() != null
+					.filter(element -> isNextEvent(element) && element.isCourse() && element.getType() != null
 							&& element.getType().toLowerCase().contains(SUFFIX_EXAM)
 							&& element.getSemester().contains(semester))
 					.limit(1).collect(Collectors.toList());

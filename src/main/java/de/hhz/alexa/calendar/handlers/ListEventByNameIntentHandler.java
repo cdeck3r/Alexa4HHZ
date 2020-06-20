@@ -28,10 +28,14 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
-			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
+			String speechText = "Dein konto is nicht verknüpt. Um dieses skill nutzen zu können, verknüpft es bitte über die Skilleinstellung in Alexa App.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
 		Optional<String> name = requestHelper.getSlotValue("name");
+		if (name.isEmpty()) {
+			return input.getResponseBuilder().withSpeech("Ich habe dich nicht verstanden").withReprompt(Utils.REPROMT)
+					.build();
+		}
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
@@ -53,7 +57,8 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
 					if (element.isCourse()) {
 						mStringBuilder.append(" beim Professor ");
-						mStringBuilder.append(element.getTeacher().split(".")[1]);
+						mStringBuilder.append(element.getOrganizer().substring(element.getOrganizer().indexOf(".") + 1,
+								element.getOrganizer().length()));
 					}
 					mStringBuilder.append(". ");
 				});
@@ -62,10 +67,7 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withReprompt(Utils.REPROMT)
-				.build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withReprompt(Utils.REPROMT).build();
 	}
-
 
 }

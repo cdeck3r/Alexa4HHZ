@@ -6,6 +6,8 @@ import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
 import com.google.api.client.util.Strings;
+
+import de.hhz.alexa.calendar.utils.AppConstants;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
@@ -39,11 +41,19 @@ public class ListExamIntentHandler implements RequestHandler {
 					.listExams(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Es gibt keine Prüfung ");
-				if(optionalSemester.isPresent()) {
-					mStringBuilder.append(" im semester ");
-					mStringBuilder.append(optionalSemester.get());}
+				if (optionalSemester.isPresent()) {
+					mStringBuilder.append("im ");
+					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
+					mStringBuilder.append("Semester.");
+				}
 			} else {
-				mStringBuilder.append("Die nächste Prüfung ist ");
+				mStringBuilder.append("Die nächste Prüfung ");
+				if (optionalSemester.isPresent()) {
+					mStringBuilder.append("im ");
+					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
+					mStringBuilder.append(" Semester ");
+				}
+				mStringBuilder.append(" ist ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append(element.getDescription());
@@ -60,10 +70,7 @@ public class ListExamIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withReprompt(Utils.REPROMT)
-				.build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withReprompt(Utils.REPROMT).build();
 	}
-
 
 }

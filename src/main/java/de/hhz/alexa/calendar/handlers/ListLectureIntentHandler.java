@@ -40,7 +40,12 @@ public class ListLectureIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listLectureByDate(optionalDate.orElse(""), optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Vorlesung an diesem Datum");
+				mStringBuilder.append("Es gibt keine Vorlesung");
+				if(optionalDate.isPresent()){
+					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
+					mStringBuilder.append(" ");
+
+				}
 				if (optionalSemester.isPresent()) {
 					mStringBuilder.append(" für das semester ");
 					mStringBuilder.append(optionalSemester.get());

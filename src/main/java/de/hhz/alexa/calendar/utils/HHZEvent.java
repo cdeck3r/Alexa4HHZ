@@ -42,7 +42,7 @@ public class HHZEvent {
 		this.description = description;
 	}
 
-	public String getTeacher() {
+	public String getOrganizer() {
 		return teacher;
 	}
 

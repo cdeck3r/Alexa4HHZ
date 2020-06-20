@@ -6,6 +6,8 @@ import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
 import com.google.api.client.util.Strings;
+
+import de.hhz.alexa.calendar.utils.AppConstants;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
@@ -39,14 +41,21 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
 					.listLecturesByTeacher(optionalTeacher.orElse(""), optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Vorlesung für ");
 				mStringBuilder.append(optionalTeacher.get());
-				if(optionalSemester.isPresent()) {
-					mStringBuilder.append(" im semester ");
-					mStringBuilder.append(optionalSemester.get());}
+				mStringBuilder.append(" hat keine Vorlesung ");
+				if (optionalSemester.isPresent()) {
+					mStringBuilder.append(" im ");
+					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
+					mStringBuilder.append(" Semester.");
+				}
 			} else {
 				mStringBuilder.append("Die nächste Vorlesung von ");
 				mStringBuilder.append(optionalTeacher.get());
+				if (optionalSemester.isPresent()) {
+					mStringBuilder.append(" im ");
+					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
+					mStringBuilder.append(" Semester ");
+				}
 				mStringBuilder.append(" ist ");
 
 				myCourse.forEach(element -> {
@@ -65,10 +74,7 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 			mStringBuilder.append(e.getMessage());
 		}
 		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString())
-				.withReprompt(Utils.REPROMT)
-				.build();
+		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withReprompt(Utils.REPROMT).build();
 	}
-
 
 }

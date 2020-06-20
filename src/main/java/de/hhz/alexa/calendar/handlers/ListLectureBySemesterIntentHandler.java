@@ -5,7 +5,10 @@ import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
+import com.amazonaws.endpointdiscovery.Constants;
 import com.google.api.client.util.Strings;
+
+import de.hhz.alexa.calendar.utils.AppConstants;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
@@ -22,12 +25,7 @@ import static com.amazon.ask.request.Predicates.intentName;
 
 public class ListLectureBySemesterIntentHandler implements RequestHandler {
 	private StringBuilder mStringBuilder;
-    private final Map<String, String> ORDINAL = new HashMap<String, String>(){{
-    	put("1", "ersten");
-    	put("2", "zweiten");
-    	put("3", "dritten");
-    	put("4", "vierten");
-    }};
+   
 	@Override
 	public boolean canHandle(HandlerInput input) {
 		return input.matches(intentName("ListLectureBySemesterIntent"));
@@ -52,7 +50,7 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 				mStringBuilder.append(optionalSemester.orElse(""));
 			} else {
 				mStringBuilder.append("Die nächste Vorlesung des ");
-				mStringBuilder.append(ORDINAL.get(optionalSemester.get()));
+				mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
 				mStringBuilder.append(" Semesters ist ");
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());

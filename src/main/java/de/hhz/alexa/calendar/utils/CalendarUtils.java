@@ -70,6 +70,7 @@ public class CalendarUtils {
 		List<Event> items = events.getItems();
 		if (!items.isEmpty()) {
 			for (Event event : items) {
+				
 				HHZEvent course = this.createEvent(event);
 				if (course != null) {
 
