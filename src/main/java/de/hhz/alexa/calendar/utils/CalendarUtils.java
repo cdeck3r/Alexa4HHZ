@@ -94,12 +94,8 @@ public class CalendarUtils {
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
 		modifiedEvents = new ArrayList<HHZEvent>();
-		HHZEvent er = null ;
 		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents(0);
 		if (ids.size() <= 0) {
-			er = new HHZEvent();
-			er.setDescription("Datenbank leer");
-			this.modifiedEvents.add(er);
 			return modifiedEvents;
 		}
 
@@ -131,8 +127,6 @@ public class CalendarUtils {
 				event = getRequest.execute();
 
 			} catch (GoogleJsonResponseException e) {
-				er = new HHZEvent();
-				er.setDescription(e.getMessage());
 				continue;
 			}
 			HHZEvent course = this.createEvent(event);
