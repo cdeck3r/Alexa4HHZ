@@ -18,6 +18,7 @@ public class HHZEvent {
 	private boolean isCourse;
 	private boolean isPosponed;
 	private String type;
+	private String user;
 
 	public HHZEvent(String description, String organizer, String semester, Date startTime, String location, String id,
 			String eTag) {
@@ -145,5 +146,13 @@ public class HHZEvent {
 			return this.id.equals(toCompare.id);
 		}
 		return false;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
 	}
 }

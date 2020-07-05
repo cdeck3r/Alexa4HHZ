@@ -20,6 +20,7 @@ import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
 import com.google.api.client.util.Strings;
 
+import de.hhz.alexa.calendar.datasource.DataSourceFactory;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
@@ -47,6 +48,8 @@ public class LaunchRequestHandler implements RequestHandler {
 		StringBuilder mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
+			DataSourceFactory.getInstance().setUser(BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).getEmail());
+			
 			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
 			if (myCourse.size() > 0) {
 				mStringBuilder
@@ -56,7 +59,7 @@ public class LaunchRequestHandler implements RequestHandler {
 					if (element.isCancelled()) {
 						mStringBuilder.append(" ist ausgefallen.");
 					} else if (element.isPosponed()) {
-						mStringBuilder.append(" wurde verschoben. Neue Uhrzeit:");
+						mStringBuilder.append(" wurde verschoben. Neuen Termin:");
 						String dateString = Utils.parseDate(element.getStartTime());
 						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 						mStringBuilder.append(" ");
@@ -68,7 +71,7 @@ public class LaunchRequestHandler implements RequestHandler {
 				speechText = mStringBuilder.toString();
 			}
 		} catch (Exception e) {
-			mStringBuilder.append(e.getMessage());
+			mStringBuilder.append("Ein Fehler is beim starten des Skills aufgetretten");
 			mStringBuilder.append("</speak>");
 			speechText = mStringBuilder.toString();
 

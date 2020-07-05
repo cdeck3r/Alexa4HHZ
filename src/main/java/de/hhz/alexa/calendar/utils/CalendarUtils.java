@@ -15,12 +15,13 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import de.hhz.alexa.calendar.datasource.DataSourceFactory;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.http.auth.Credentials;
 
 @SuppressWarnings("deprecation")
 public class CalendarUtils {
@@ -53,17 +54,14 @@ public class CalendarUtils {
 
 		DateTime now = new DateTime(System.currentTimeMillis());
 		Events events = null;
-		List<HHZEvent> savedEvents = DataSourceFactory.getInstance().loadEvents();
+		List<HHZEvent> savedEvents = DataSourceFactory.getInstance().loadEvents(0);
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-		Calendar service;
-		if (!Strings.isNullOrEmpty(this.accessTocken)) {
+		
+		
 			GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
-			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
+			Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
 					.setApplicationName(APPLICATION_NAME).build();
-		} else {
-			service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, this.credential)
-					.setApplicationName(APPLICATION_NAME).build();
-		}
+			
 		events = service.events().list("primary").setTimeMin(now).
 				setCalendarId(HHZ_CALENDAR).
 				setOrderBy("startTime").setSingleEvents(true).execute();
@@ -72,15 +70,16 @@ public class CalendarUtils {
 			for (Event event : items) {
 				
 				HHZEvent course = this.createEvent(event);
-				if (course != null) {
-
+				
+				if ((course != null)&&(course.getDescription() != null)) {
 					this.eventList.add(course);
 					List<HHZEvent> uniqueEvent = savedEvents.stream()
 							.filter(element -> element.getId().equals(event.getId())).collect(Collectors.toList());
-					if (uniqueEvent == null || uniqueEvent.size() <= 0) {
-						// event not saved in database
+					if (uniqueEvent == null || uniqueEvent.size()<=0) {
+						// add  event to database
 						eventsToAdd.add(course);
 					} else {
+						//Delete old events from database
 						if (uniqueEvent.get(0).getStartTime().before(new Date())) {
 							DataSourceFactory.getInstance().deleteEvent(uniqueEvent.get(0));
 						}
@@ -95,12 +94,17 @@ public class CalendarUtils {
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
 		modifiedEvents = new ArrayList<HHZEvent>();
-
-		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents();
+		HHZEvent er = null ;
+		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents(0);
 		if (ids.size() <= 0) {
+			er = new HHZEvent();
+			er.setDescription("Datenbank leer");
+			this.modifiedEvents.add(er);
 			return modifiedEvents;
 		}
-		int limit = ids.size() > 10 ? 10 : ids.size();
+
+//		int limit = ids.size() > 10 ? 10 : ids.size();
+		int limit = ids.size();
 		int counter = 0;
 		Event event = null;
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -119,12 +123,16 @@ public class CalendarUtils {
 				break;
 			}
 			counter++;
-			Calendar.Events.Get getRequest = service.events().get("primary", ev.getId());
+			Calendar.Events.Get getRequest = service.events().
+					get("primary", ev.getId()).setCalendarId(HHZ_CALENDAR);
 			getRequest.setRequestHeaders(new HttpHeaders().setIfNoneMatch(ev.geteTag()));
+			
 			try {
 				event = getRequest.execute();
 
 			} catch (GoogleJsonResponseException e) {
+				er = new HHZEvent();
+				er.setDescription(e.getMessage());
 				continue;
 			}
 			HHZEvent course = this.createEvent(event);
@@ -146,6 +154,17 @@ public class CalendarUtils {
 		summary = summary.replaceFirst(" ", "-");
 		summary = summary.replaceAll("--", "-");
 		return summary.split("-");
+	}
+	
+	public  String getEmailAddress() throws Exception {
+		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+		GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
+		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
+				.setApplicationName(APPLICATION_NAME).build();
+		DateTime now = new DateTime(System.currentTimeMillis());
+		Events events = service.events().list("primary").setTimeMin(now).setMaxResults(1).setSingleEvents(true)
+				.execute();
+		return events.getSummary();
 	}
 
 	private HHZEvent createEvent(Event event) {

@@ -2,6 +2,7 @@ package de.hhz.alexa.calendar.datasource;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,41 +28,46 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 
+import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 
 public class DataSourceFactory {
 	private String tableName = "Events";
 	private Table table;
 	private AmazonDynamoDB client;
+	private String user = "user";
 	private static DataSourceFactory mDataSourceFactory;
 
 	private DataSourceFactory() throws InterruptedException {
 		client = AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
 //				new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "us-west-2")).build();
-				new AwsClientBuilder.EndpointConfiguration("https://dynamodb.us-east-1.amazonaws.com", "us-east-1")).build();
+				new AwsClientBuilder.EndpointConfiguration("https://dynamodb.us-east-1.amazonaws.com", "us-east-1"))
+				.build();
 		DynamoDB dynamoDB = new DynamoDB(client);
 		this.table = dynamoDB.getTable(tableName);
-//		this.table.delete();
 		List<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 		attributeDefinitions.add(new AttributeDefinition().withAttributeName("id").withAttributeType("S"));
+		attributeDefinitions.add(new AttributeDefinition().withAttributeName("userEmail").withAttributeType("S"));
 
 		List<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
 		keySchema.add(new KeySchemaElement().withAttributeName("id").withKeyType(KeyType.HASH));
+		keySchema.add(new KeySchemaElement().withAttributeName("userEmail").withKeyType(KeyType.RANGE));
 
 		CreateTableRequest request = new CreateTableRequest().withTableName(tableName).withKeySchema(keySchema)
 				.withAttributeDefinitions(attributeDefinitions).withProvisionedThroughput(
 						new ProvisionedThroughput().withReadCapacityUnits(5L).withWriteCapacityUnits(5L));
 		TableUtils.createTableIfNotExists(client, request);
 		this.table.waitForActive();
+		System.out.println("database running");
 	}
 
 	public void saveEvents(List<HHZEvent> courses) {
-		if (Objects.isNull(courses) || courses.size() < 1) {
+		if (Objects.isNull(courses) || courses.size() < 1||this.user == null) {
 			return;
 		}
 		courses.forEach(c -> {
-			this.table.putItem(new Item().withPrimaryKey("id", c.getId()).withString("eTag", c.geteTag())
-					.withString("startTime", c.getStartTime().getTime() + ""));
+			this.table.putItem(new Item().withPrimaryKey("id", c.getId(), "userEmail", this.user)
+					.withString("eTag", c.geteTag()).withString("startTime", c.getStartTime().getTime() + ""));
 		});
 	}
 
@@ -73,7 +79,7 @@ public class DataSourceFactory {
 			deleteEvent(course);
 			return;
 		}
-		UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("id", course.getId())
+		UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("id", course.getId(), "userEmail", this.user)
 				.withUpdateExpression("set eTag = :e, startTime= :st").withValueMap(new ValueMap()
 						.withString(":st", course.getStartTime().getTime() + "").withString(":e", course.geteTag()))
 				.withReturnValues(ReturnValue.UPDATED_NEW);
@@ -85,25 +91,36 @@ public class DataSourceFactory {
 			return;
 		}
 
-		DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey("id", course.getId())
+		DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey("id", course.getId(), "userEmail", this.user)
 				.withReturnValues(ReturnValue.ALL_OLD);
 		DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
 		System.out.println("Deleted " + outcome.getItem());
 
 	}
 
-	public List<HHZEvent> loadEvents() throws Exception {
+	public List<HHZEvent> loadEvents(int maxResult) throws Exception {
 		List<HHZEvent> eventList = new ArrayList<HHZEvent>();
-		ScanRequest scanRequest = new ScanRequest().withTableName(this.tableName);
+		Map<String, AttributeValue> map = new HashMap<String, AttributeValue>();
+		map.put(":us", new AttributeValue().withS(this.user));
+		ScanRequest scanRequest = new ScanRequest().withTableName(this.tableName).withFilterExpression("userEmail=:us")
+				.withExpressionAttributeValues(map);
+		if (maxResult > 0) {
+			scanRequest.setLimit(maxResult);
+		}
 		ScanResult result = this.client.scan(scanRequest);
 		for (Map<String, AttributeValue> item : result.getItems()) {
 			HHZEvent event = new HHZEvent();
 			event.setId(item.get("id").getS());
 			event.seteTag(item.get("eTag").getS());
 			event.setStartTime(new Date(Long.parseLong(item.get("startTime").getS())));
+			event.setUser(item.get("userEmail").getS());
 			eventList.add(event);
 		}
 		return eventList;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
 	}
 
 	public static DataSourceFactory getInstance() throws Exception {

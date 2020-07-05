@@ -152,6 +152,10 @@ public class BDCourse {
 		}
 		return false;
 	}
+	
+	public String getEmail() throws Exception {
+			return this.mCalendarUtils.getEmailAddress();
+	}
 
 	public static BDCourse getInstance(Credential tocken) {
 		if (mBDCourse != null) {
