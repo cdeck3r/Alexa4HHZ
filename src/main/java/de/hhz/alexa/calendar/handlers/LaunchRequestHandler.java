@@ -38,19 +38,17 @@ public class LaunchRequestHandler implements RequestHandler {
 
 	@Override
 	public Optional<Response> handle(HandlerInput input) {
-		String speechText = "HHZ Studienkalendar geöffnet. Was möchstest du gern wissen?";
+		String speechText = "HHZ Studienkalendar geöffnet. Was möchtest du gern wissen?";
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
-			speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
+			speechText = "Dein Studienkalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withLinkAccountCard().build();
 		}
 		List<HHZEvent> myCourse = null;
 		StringBuilder mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
-			DataSourceFactory.getInstance().setUser(BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).getEmail());
-			
-			myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
+			myCourse = BDCourse.getInstance().getInstanceByUser(requestHelper.getAccountLinkingAccessToken()).listModifiedEvents();
 			if (myCourse.size() > 0) {
 				mStringBuilder
 						.append("HHZ Studienkalendar geöffnet. Achtung. Neue Meldung vom HHZ. Die Veranstaltung ");

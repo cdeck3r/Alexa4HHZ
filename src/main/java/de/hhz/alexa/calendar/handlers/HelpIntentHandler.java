@@ -32,12 +32,12 @@ public class HelpIntentHandler implements RequestHandler {
 	public Optional<Response> handle(HandlerInput input) {
 		String speechText = "Du kannst mir folgende Fragen stellen: "
 				+ "Was steht alles morgen für z.B. das erste Semester an"
-				+ "Was steht alles an für z.B. heute, morgen, diese Woche, nächste Woche, nächsten Montag."
+				+ "Was steht alles an für: heute, morgen, diese Woche, nächste Woche, nächsten Montag."
 				+ "Wann ist die nächste Vorlesung von z.B. Herr Decker? "
 				+ "Wann ist die nächste Vorlesung von Herr Decker für z.B. das erste semester? "
 				+ "Wann findet die nächste Prüfung statt? "
-				+ "Wann findet die nächste Prüfung im z.B. ersten semester statt? "
-				+ "Wann ist die nächste Vorlesung des z.B. dritten Semester? "
+				+ "Wann findet die nächste Prüfung im ersten semester statt? "
+				+ "Wann ist die nächste Vorlesung des dritten Semester? "
 				+ "Wann findet z.B. der Projekttag statt? ";
 
 

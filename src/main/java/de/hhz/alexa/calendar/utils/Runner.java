@@ -52,11 +52,22 @@ public class Runner {
 //
 		String token = getCredentials(HTTP_TRANSPORT).getAccessToken();
 //		System.out.println(token);
-		BDCourse bdCourse= BDCourse.getInstance(token);
-		DataSourceFactory.getInstance().setUser(bdCourse.getEmail());
-		bdCourse.listEventByName("testvorlesung").forEach(c->{System.out.println(c.getDescription());});
-		bdCourse.listModifiedEvents().forEach(c->{System.out.println(c.getDescription());});
+		BDCourse bdCourse= BDCourse.getInstance().getInstanceByUser(token);
+//		DataSourceFactory.getInstance().setUser(bdCourse.getEmail());
 
+		bdCourse.listEventByName("testvorlesung").forEach(c->{System.out.println(c.getDescription());});
+		bdCourse.listModifiedEvents().forEach(c->{System.out.println(c.getDescription());System.out.println(c.getId());});
+
+//		HHZEvent event=DataSourceFactory.getInstance().loadEvents(10).get(1);
+//		System.out.println(event.getId()+"--"+event.getUser()+"-- "+event.geteTag());
+//		event.seteTag("1230");
+//		DataSourceFactory.getInstance().updateEvent(event);
+//		System.out.println("--------------------------");
+//		bdCourse.listModifiedEvents().forEach(c->{System.out.println(c.getDescription());System.out.println(c.getId());});
+
+		
+		
+		
 
 	}
 }

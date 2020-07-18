@@ -43,7 +43,7 @@ public class ListLectureBySemesterIntentHandler implements RequestHandler {
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
-			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
+			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(requestHelper.getAccountLinkingAccessToken())
 					.listLectureBySemester(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Es gibt keine Vorlesung für das Semester ");

@@ -38,7 +38,7 @@ public class ListLectureByTeacherIntentHandler implements RequestHandler {
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
-			List<HHZEvent> myCourse = BDCourse.getInstance(requestHelper.getAccountLinkingAccessToken())
+			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(requestHelper.getAccountLinkingAccessToken())
 					.listLecturesByTeacher(optionalTeacher.orElse(""), optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append(optionalTeacher.get());

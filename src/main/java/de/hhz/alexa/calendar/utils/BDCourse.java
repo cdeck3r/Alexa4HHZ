@@ -2,12 +2,11 @@ package de.hhz.alexa.calendar.utils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.http.auth.Credentials;
-
-import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.Strings;
 
 public class BDCourse {
@@ -15,13 +14,13 @@ public class BDCourse {
 	private static final CharSequence SUFFIX_EXAM = "prüfung";
 	private static BDCourse mBDCourse;
 	private CalendarUtils mCalendarUtils;
+	private static Map<String, BDCourse> instances = new HashMap<String, BDCourse>();
 
-	private BDCourse(final Credential accessTocken) {
-		this.mCalendarUtils = new CalendarUtils(accessTocken);
+	private BDCourse(final String accesToken) throws Exception {
+		this.mCalendarUtils = new CalendarUtils(accesToken);
 	}
 
-	private BDCourse(final String accessTocken) {
-		this.mCalendarUtils = new CalendarUtils(accessTocken);
+	private BDCourse() throws Exception {
 	}
 
 	public List<HHZEvent> listLecturesByTeacher(final String teachter, final String semester) throws Exception {
@@ -152,24 +151,22 @@ public class BDCourse {
 		}
 		return false;
 	}
-	
-	public String getEmail() throws Exception {
-			return this.mCalendarUtils.getEmailAddress();
-	}
 
-	public static BDCourse getInstance(Credential tocken) {
+	public static BDCourse getInstance() throws Exception {
 		if (mBDCourse != null) {
 			return mBDCourse;
 		}
-		mBDCourse = new BDCourse(tocken);
+		mBDCourse = new BDCourse();
 		return mBDCourse;
 	}
 
-	public static BDCourse getInstance(String tocken) {
-		if (mBDCourse != null) {
-			return mBDCourse;
+	public BDCourse getInstanceByUser(String token) throws Exception {
+		if (instances.containsKey(token)) {
+			return instances.get(token);
 		}
-		mBDCourse = new BDCourse(tocken);
+		BDCourse mBDCourse = new BDCourse(token);
+		instances.put(token, mBDCourse);
 		return mBDCourse;
+
 	}
 }

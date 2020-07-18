@@ -14,6 +14,7 @@ import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
@@ -28,14 +29,12 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 
-import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 
 public class DataSourceFactory {
 	private String tableName = "Events";
 	private Table table;
 	private AmazonDynamoDB client;
-	private String user = "user";
 	private static DataSourceFactory mDataSourceFactory;
 
 	private DataSourceFactory() throws InterruptedException {
@@ -61,48 +60,51 @@ public class DataSourceFactory {
 		System.out.println("database running");
 	}
 
-	public void saveEvents(List<HHZEvent> courses) {
-		if (Objects.isNull(courses) || courses.size() < 1||this.user == null) {
+	public void saveEvents(List<HHZEvent> courses, String user) {
+		if (Objects.isNull(courses) || courses.size() < 1 || user == null) {
 			return;
 		}
 		courses.forEach(c -> {
-			this.table.putItem(new Item().withPrimaryKey("id", c.getId(), "userEmail", this.user)
+			this.table.putItem(new Item().withPrimaryKey("id", c.getId(), "userEmail", user)
 					.withString("eTag", c.geteTag()).withString("startTime", c.getStartTime().getTime() + ""));
 		});
 	}
 
-	public void updateEvent(HHZEvent course) throws Exception {
+	public void updateEvent(HHZEvent course, String user) throws Exception {
 		if (Objects.isNull(course)) {
 			return;
 		}
 		if (course.isCancelled()) {
-			deleteEvent(course);
+			deleteEvent(course, user);
 			return;
 		}
-		UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("id", course.getId(), "userEmail", this.user)
+		UpdateItemSpec updateItemSpec = new UpdateItemSpec()
+				.withPrimaryKey("id", course.getId(), "userEmail", user)
 				.withUpdateExpression("set eTag = :e, startTime= :st").withValueMap(new ValueMap()
 						.withString(":st", course.getStartTime().getTime() + "").withString(":e", course.geteTag()))
 				.withReturnValues(ReturnValue.UPDATED_NEW);
-		this.table.updateItem(updateItemSpec);
+		UpdateItemOutcome outcome= this.table.updateItem(updateItemSpec);
+		System.out.println(outcome.getItem().toJSONPretty());
 	}
 
-	public void deleteEvent(HHZEvent course) throws Exception {
+	public void deleteEvent(HHZEvent course, String user) throws Exception {
 		if (Objects.isNull(course) && !course.isCancelled()) {
 			return;
 		}
 
-		DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey("id", course.getId(), "userEmail", this.user)
-				.withReturnValues(ReturnValue.ALL_OLD);
+		DeleteItemSpec deleteItemSpec = new DeleteItemSpec()
+				.withPrimaryKey("id", course.getId(), "userEmail", user).withReturnValues(ReturnValue.ALL_OLD);
 		DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
 		System.out.println("Deleted " + outcome.getItem());
 
 	}
 
-	public List<HHZEvent> loadEvents(int maxResult) throws Exception {
+	public List<HHZEvent> loadEvents(int maxResult, String user) throws Exception {
 		List<HHZEvent> eventList = new ArrayList<HHZEvent>();
 		Map<String, AttributeValue> map = new HashMap<String, AttributeValue>();
-		map.put(":us", new AttributeValue().withS(this.user));
-		ScanRequest scanRequest = new ScanRequest().withTableName(this.tableName).withFilterExpression("userEmail=:us")
+		map.put(":us", new AttributeValue().withS(user));
+		ScanRequest scanRequest = new ScanRequest().withTableName(this.tableName)
+				.withFilterExpression("userEmail=:us")
 				.withExpressionAttributeValues(map);
 		if (maxResult > 0) {
 			scanRequest.setLimit(maxResult);
@@ -116,12 +118,11 @@ public class DataSourceFactory {
 			event.setUser(item.get("userEmail").getS());
 			eventList.add(event);
 		}
+		eventList.forEach(e->{System.out.println("id="+e.getId()+"etag="+e.geteTag()+"email="+e.getUser());});
 		return eventList;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
-	}
+
 
 	public static DataSourceFactory getInstance() throws Exception {
 		if (mDataSourceFactory != null) {
