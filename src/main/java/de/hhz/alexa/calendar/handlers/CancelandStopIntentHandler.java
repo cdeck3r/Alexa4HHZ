@@ -29,7 +29,7 @@ public class CancelandStopIntentHandler implements RequestHandler {
 
     @Override
     public Optional<Response> handle(HandlerInput input) {
-        String speechText = "Der Kalender schlieﬂ";
+        String speechText = "Der Kalender schlieﬂt";
         return input.getResponseBuilder()
                 .withSpeech(speechText)
                 .build();

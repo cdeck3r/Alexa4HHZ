@@ -33,8 +33,6 @@ public class CalendarUtils {
 	List<HHZEvent> eventList = new ArrayList<HHZEvent>();
 	List<HHZEvent> modifiedEvents = new ArrayList<HHZEvent>();
 
-
-
 	public CalendarUtils(final String acessTocken) throws Exception {
 		this.accessTocken = acessTocken;
 		this.user = this.getEmailAddress();
@@ -50,7 +48,7 @@ public class CalendarUtils {
 
 		DateTime now = new DateTime(System.currentTimeMillis());
 		Events events = null;
-		List<HHZEvent> savedEvents = DataSourceFactory.getInstance().loadEvents(0,this.user);
+		List<HHZEvent> savedEvents = DataSourceFactory.getInstance().loadEvents(0, this.user);
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
 		GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
@@ -71,37 +69,37 @@ public class CalendarUtils {
 							.filter(element -> element.getId().equals(event.getId())).collect(Collectors.toList());
 					if (uniqueEvent == null || uniqueEvent.size() <= 0) {
 						// add event to database
-						if((eventsToAdd.size() + savedEvents.size()) < MAX_DB_EVENT) {
+						if ((eventsToAdd.size() + savedEvents.size()) < MAX_DB_EVENT) {
 							eventsToAdd.add(course);
 						}
 					} else {
 						// Delete old events from database
 						if (uniqueEvent.get(0).getStartTime().before(new Date())) {
-							DataSourceFactory.getInstance().deleteEvent(uniqueEvent.get(0),this.user);
+							DataSourceFactory.getInstance().deleteEvent(uniqueEvent.get(0), this.user);
 						}
 					}
 				}
 
 			}
-			DataSourceFactory.getInstance().saveEvents(eventsToAdd,this.user);
+			DataSourceFactory.getInstance().saveEvents(eventsToAdd, this.user);
 		}
 		return this.eventList;
 	}
 
 	public List<HHZEvent> listModifiedEvents() throws Exception {
 		modifiedEvents = new ArrayList<HHZEvent>();
-		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents(0,this.user);
+		List<HHZEvent> ids = DataSourceFactory.getInstance().loadEvents(0, this.user);
 		if (ids.size() <= 0) {
 			return modifiedEvents;
 		}
-		
+
 		int limit = ids.size() > MAX_DB_EVENT ? MAX_DB_EVENT : ids.size();
 		int counter = 0;
 		Event event = null;
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
-			Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
-					.setApplicationName(APPLICATION_NAME).build();
+		GoogleCredential mGoogleCredential = new GoogleCredential().setAccessToken(this.accessTocken);
+		Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, mGoogleCredential)
+				.setApplicationName(APPLICATION_NAME).build();
 
 		for (HHZEvent ev : ids) {
 			if (counter >= limit) {
@@ -123,7 +121,7 @@ public class CalendarUtils {
 					course.setPosponed(true);
 				}
 				modifiedEvents.add(course);
-				DataSourceFactory.getInstance().updateEvent(course,this.user);
+				DataSourceFactory.getInstance().updateEvent(course, this.user);
 			}
 		}
 		return modifiedEvents;
@@ -131,10 +129,12 @@ public class CalendarUtils {
 
 	private String[] getStringArray(String summary) {
 		summary = summary.replaceAll("null", "");
-		summary = summary.replaceAll("[:,\\(]", "-");
-		summary = summary.replaceAll("\\)", "");
-		summary = summary.replaceFirst(" ", "-");
-		summary = summary.replaceAll("--", "-");
+		if (summary.startsWith(DBE_PREFIX)) {
+			summary = summary.replaceAll("[:,\\(]", "-");
+			summary = summary.replaceAll("\\)", "");
+			summary = summary.replaceFirst(" ", "-");
+			summary = summary.replaceAll("--", "-");
+		}
 		return summary.split("-");
 	}
 

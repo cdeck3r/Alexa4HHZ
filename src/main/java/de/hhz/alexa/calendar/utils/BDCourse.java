@@ -99,6 +99,10 @@ public class BDCourse {
 		if (Strings.isNullOrEmpty(subject)) {
 			return null;
 		}
+		if (subject.toLowerCase().equals("event")) {
+			return this.mCalendarUtils.listEvents().stream().filter(element -> !element.isCourse()).limit(1)
+					.collect(Collectors.toList());
+		}
 		return this.mCalendarUtils.listEvents().stream()
 				.filter(element -> element.getDescription().toLowerCase().contains(subject.toLowerCase())).limit(1)
 				.collect(Collectors.toList());
@@ -110,6 +114,11 @@ public class BDCourse {
 	 * @throws Exception
 	 */
 	public List<HHZEvent> listLectureBySemester(String semester) throws Exception {
+		if(Strings.isNullOrEmpty(semester)) {
+			return this.mCalendarUtils.listEvents().stream().filter(
+					element -> isNextEvent(element) && element.isCourse())
+					.limit(1).collect(Collectors.toList());
+		}
 		return this.mCalendarUtils.listEvents().stream().filter(
 				element -> isNextEvent(element) && element.isCourse() && element.getSemester().contains(semester))
 				.limit(1).collect(Collectors.toList());
