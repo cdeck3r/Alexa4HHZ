@@ -1,4 +1,3 @@
-
 package de.hhz.alexa.calendar.handlers;
 
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
@@ -31,9 +30,9 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 			String speechText = "Dein konto is nicht verknüpt. Um dieses skill nutzen zu können, verknüpft es bitte über die Skilleinstellung in Alexa App.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
-		Optional<String> name = requestHelper.getSlotValue("name");
+		Optional<String> name = requestHelper.getSlotValue("eventName");
 		if (name.isEmpty()) {
-			return input.getResponseBuilder().withSpeech("Ich habe dich nicht verstanden").withReprompt(Utils.REPROMT)
+			return input.getResponseBuilder().withSpeech("Ich habe leider dazu keine Antwort").withReprompt(Utils.REPROMT)
 					.build();
 		}
 		mStringBuilder = new StringBuilder();

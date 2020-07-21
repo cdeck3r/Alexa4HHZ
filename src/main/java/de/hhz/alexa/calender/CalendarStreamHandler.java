@@ -14,19 +14,15 @@
 package de.hhz.alexa.calender;
 
 import com.amazon.ask.Skill;
+import com.amazon.ask.SkillStreamHandler;
 import com.amazon.ask.Skills;
 
 import de.hhz.alexa.calendar.handlers.CancelandStopIntentHandler;
 import de.hhz.alexa.calendar.handlers.HelpIntentHandler;
 import de.hhz.alexa.calendar.handlers.LaunchRequestHandler;
 import de.hhz.alexa.calendar.handlers.ListEventByNameIntentHandler;
-import de.hhz.alexa.calendar.handlers.ListExamIntentHandler;
-import de.hhz.alexa.calendar.handlers.ListLectureBySemesterIntentHandler;
-import de.hhz.alexa.calendar.handlers.ListLectureByTeacherIntentHandler;
 import de.hhz.alexa.calendar.handlers.ListLectureIntentHandler;
 import de.hhz.alexa.calendar.handlers.SessionEndedRequestHandler;
-
-import com.amazon.ask.SkillStreamHandler;
 
 //mvn assembly:assembly -DdescriptorId=jar-with-dependencies package
 
@@ -40,11 +36,8 @@ public class CalendarStreamHandler extends SkillStreamHandler {
                         new ListLectureIntentHandler(),
                         new HelpIntentHandler(),
                         new LaunchRequestHandler(),
-                        new SessionEndedRequestHandler(),
-                        new ListLectureBySemesterIntentHandler(),
-                        new ListLectureByTeacherIntentHandler(),
                         new ListEventByNameIntentHandler(),
-                        new ListExamIntentHandler())
+                        new SessionEndedRequestHandler())
                 // Add your skill id below
                 //.withSkillId("")
                 .build();

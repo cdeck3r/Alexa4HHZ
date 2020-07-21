@@ -1,50 +1,27 @@
 
 package de.hhz.alexa.calendar.handlers;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
-import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
-import com.amazon.ask.request.RequestHelper;
-import com.amazonaws.endpointdiscovery.Constants;
-import com.google.api.client.util.Strings;
 
 import de.hhz.alexa.calendar.utils.AppConstants;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+public class LectureBySemesterBuilder{
+	private static StringBuilder mStringBuilder;
+	public static Optional<Response> build(HandlerInput input, String token, Optional<String> optionalSemester) {
 
-import static com.amazon.ask.request.Predicates.intentName;
-
-public class ListLectureBySemesterIntentHandler implements RequestHandler {
-	private StringBuilder mStringBuilder;
-
-	@Override
-	public boolean canHandle(HandlerInput input) {
-		return input.matches(intentName("ListLectureBySemesterIntent"));
-	}
-
-	@Override
-	public Optional<Response> handle(HandlerInput input) {
-
-		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
-		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
-			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
-			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
-		}
-		Optional<String> optionalSemester = requestHelper.getSlotValue("semesterNumber");
+	
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance()
-					.getInstanceByUser(requestHelper.getAccountLinkingAccessToken())
+					.getInstanceByUser(token)
 					.listLectureBySemester(optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Es gibt keine Vorlesung für das Semester ");

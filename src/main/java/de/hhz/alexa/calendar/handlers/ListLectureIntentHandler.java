@@ -1,22 +1,19 @@
 
 package de.hhz.alexa.calendar.handlers;
 
+import static com.amazon.ask.request.Predicates.intentName;
+
+import java.util.Optional;
+
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
 import com.google.api.client.util.Strings;
-import de.hhz.alexa.calendar.utils.BDCourse;
-import de.hhz.alexa.calendar.utils.HHZEvent;
+
 import de.hhz.alexa.calendar.utils.Utils;
 
-import java.util.List;
-import java.util.Optional;
-
-import static com.amazon.ask.request.Predicates.intentName;
-
 public class ListLectureIntentHandler implements RequestHandler {
-	private StringBuilder mStringBuilder;
 
 	@Override
 	public boolean canHandle(HandlerInput input) {
@@ -25,51 +22,36 @@ public class ListLectureIntentHandler implements RequestHandler {
 
 	@Override
 	public Optional<Response> handle(HandlerInput input) {
-
+		Optional<Response> response = null;
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
+		String token = requestHelper.getAccountLinkingAccessToken();
 		Optional<String> optionalDate = requestHelper.getSlotValue("date");
 		Optional<String> optionalSemester = requestHelper.getSlotValue("semesterNumber");
+		Optional<String> optionalTeacher = requestHelper.getSlotValue("teacher");
+		Optional<String> optionalEventType = requestHelper.getSlotValue("eventType");
 
-		mStringBuilder = new StringBuilder();
-		mStringBuilder.append("<speak>");
-		try {
-			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(requestHelper.getAccountLinkingAccessToken())
-					.listLectureByDate(optionalDate.orElse(""), optionalSemester.orElse(""));
-			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Vorlesung ");
-				if(optionalDate.isPresent()){
-					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
-					mStringBuilder.append(" ");
+		String event = optionalEventType.get();
+		if (event.toLowerCase().contains("prüfung") || event.toLowerCase().contains("klasur")) {
+			return ExamBuilder.build(input, token, optionalSemester);
 
-				}
-				if (optionalSemester.isPresent()) {
-					mStringBuilder.append(" für das semester ");
-					mStringBuilder.append(optionalSemester.get());
-				}
-			} else {
-
-				myCourse.forEach(element -> {
-					String dateString = Utils.parseDate(element.getStartTime());
-					mStringBuilder.append(" am ");
-					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
-					mStringBuilder.append(" um ");
-					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ");
-					mStringBuilder.append(Utils.getLocation(element.getLocation()));
-					mStringBuilder.append(" ist ");
-					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(". ");
-				});
-			}
-		} catch (Exception e) {
-			mStringBuilder.append(e.getMessage());
 		}
-		mStringBuilder.append("</speak>");
-		return input.getResponseBuilder().withSpeech(mStringBuilder.toString()).withReprompt(Utils.REPROMT).build();
+		if (optionalDate.isPresent()) {
+			response = LectureByDayBuilder.build(input, token, optionalDate, optionalSemester);
+		} else if (optionalTeacher.isPresent()) {
+			response = LectureByTeacherBuilder.build(input, token, optionalTeacher, optionalSemester);
+		} else if (optionalSemester.isPresent() || (event.toLowerCase().contains("vorlesung")
+				|| event.toLowerCase().contains("vorlesen") || event.toLowerCase().contains("klasur"))) {
+			response = LectureBySemesterBuilder.build(input, token, optionalSemester);
+		} else {
+			response = input.getResponseBuilder().withSpeech("Ich habe leider dazu keine Antwort")
+					.withReprompt(Utils.REPROMT).build();
+
+		}
+		return response;
 	}
 
 }

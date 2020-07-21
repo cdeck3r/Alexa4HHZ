@@ -1,69 +1,55 @@
 
 package de.hhz.alexa.calendar.handlers;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
-import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
-import com.amazon.ask.request.RequestHelper;
-import com.google.api.client.util.Strings;
 
 import de.hhz.alexa.calendar.utils.AppConstants;
 import de.hhz.alexa.calendar.utils.BDCourse;
 import de.hhz.alexa.calendar.utils.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
-import java.util.List;
-import java.util.Optional;
 
-import static com.amazon.ask.request.Predicates.intentName;
+public class LectureByTeacherBuilder {
+	private static StringBuilder mStringBuilder;
 
-public class ListExamIntentHandler implements RequestHandler {
-	private StringBuilder mStringBuilder;
-
-	@Override
-	public boolean canHandle(HandlerInput input) {
-		return input.matches(intentName("ListExamIntent"));
-	}
-
-	@Override
-	public Optional<Response> handle(HandlerInput input) {
-
-		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
-		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
-			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
-			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
-		}
-		Optional<String> optionalSemester = requestHelper.getSlotValue("semesterNumber");
-
+	
+	public static Optional<Response> build(HandlerInput input, String token, Optional<String> optionalTeacher,Optional<String> optionalSemester) {
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
-			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(requestHelper.getAccountLinkingAccessToken())
-					.listExams(optionalSemester.orElse(""));
+			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(token)
+					.listLecturesByTeacher(optionalTeacher.orElse(""), optionalSemester.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Prüfung ");
+				mStringBuilder.append(optionalTeacher.get());
+				mStringBuilder.append(" hat keine Vorlesung ");
 				if (optionalSemester.isPresent()) {
-					mStringBuilder.append("im ");
+					mStringBuilder.append(" im ");
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
-					mStringBuilder.append("Semester.");
+					mStringBuilder.append(" Semester.");
 				}
 			} else {
-				mStringBuilder.append("Die nächste Prüfung ");
+				mStringBuilder.append("Die nächste Vorlesung von ");
+				mStringBuilder.append(optionalTeacher.get());
 				if (optionalSemester.isPresent()) {
-					mStringBuilder.append("im ");
+					mStringBuilder.append(" im ");
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
 					mStringBuilder.append(" Semester ");
 				}
 				mStringBuilder.append(" ist ");
+
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDate(element.getStartTime());
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" am ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
-					mStringBuilder.append(" um ");
+					mStringBuilder.append(" ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
-					mStringBuilder.append(". ");
+					mStringBuilder.append(".");
 				});
 			}
 		} catch (Exception e) {
