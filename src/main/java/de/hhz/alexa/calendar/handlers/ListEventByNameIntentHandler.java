@@ -32,26 +32,27 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 		}
 		Optional<String> name = requestHelper.getSlotValue("eventName");
 		if (name.isEmpty()) {
-			return input.getResponseBuilder().withSpeech("Ich habe leider dazu keine Antwort").withReprompt(Utils.REPROMT)
-					.build();
+			return input.getResponseBuilder().withSpeech("Ich habe leider dazu keine Antwort")
+					.withReprompt(Utils.REPROMT).build();
 		}
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
-			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(requestHelper.getAccountLinkingAccessToken())
-					.listEventByName(name.orElse(""));
+			List<HHZEvent> myCourse = BDCourse.getInstance()
+					.getInstanceByUser(requestHelper.getAccountLinkingAccessToken()).listEventByName(name.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Es gibt keine Veranstaltung mit dem Name ");
 				mStringBuilder.append(name.get());
 			} else {
-				mStringBuilder.append("am ");
 				myCourse.forEach(element -> {
-					String dateString = Utils.parseDate(element.getStartTime());
+					mStringBuilder.append(element.getDescription());
+					mStringBuilder.append(" ist am ");
+					mStringBuilder.append(Utils.parseDateToDayWeek((element.getStartTime())));
+					mStringBuilder.append(" ");
+					String dateString = Utils.parseDateSimplified(element.getStartTime());
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
-					mStringBuilder.append(" ist ");
-					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" ");
 					mStringBuilder.append(Utils.getLocation(element.getLocation()));
 					if (element.isCourse()) {

@@ -12,16 +12,12 @@ import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInsta
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
-
-import de.hhz.alexa.calendar.datasource.DataSourceFactory;
 
 public class Runner {
 
@@ -49,9 +45,11 @@ public class Runner {
 	public static void main(String args[]) throws Exception {
 //		Runner runner =new Runner();
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-//
-		String token = getCredentials(HTTP_TRANSPORT).getAccessToken();
-//		System.out.println(token);
+		Credential credentials=getCredentials(HTTP_TRANSPORT);
+		String token = credentials.getAccessToken();
+		System.out.println(token);
+		System.out.println(credentials.getRefreshToken());
+		System.out.println(credentials.getExpiresInSeconds());
 		BDCourse bdCourse= BDCourse.getInstance().getInstanceByUser(token);
 //		DataSourceFactory.getInstance().setUser(bdCourse.getEmail());
 

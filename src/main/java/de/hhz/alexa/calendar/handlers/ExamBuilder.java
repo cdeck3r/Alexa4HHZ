@@ -1,6 +1,7 @@
 
 package de.hhz.alexa.calendar.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,33 +16,47 @@ import de.hhz.alexa.calendar.utils.Utils;
 public class ExamBuilder {
 	private static StringBuilder mStringBuilder;
 
-	public static Optional<Response> build(HandlerInput input, String token, Optional<String> optionalSemester) {
+	public static Optional<Response> build(HandlerInput input, String token, Optional<String> optionalSemester,
+			Optional<String> optionalDate) {
 
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
 			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(token)
-					.listExams(optionalSemester.orElse(""));
+					.listExams(optionalSemester.orElse(""),optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Es gibt keine Prüfung ");
-				if (optionalSemester.isPresent()) {
+				if (optionalDate.isPresent()) {
+					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
+					mStringBuilder.append(" ");
+				}
+				if (optionalSemester.isPresent() && !optionalSemester.get().equals("?")) {
 					mStringBuilder.append("im ");
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
 					mStringBuilder.append(" Semester.");
 				}
+
 			} else {
-				mStringBuilder.append("Die nächste Prüfung ");
+				if (optionalDate.isPresent()) {
+					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
+				} else {
+						mStringBuilder.append("Die nächste Prüfung ");
+					}
 				if (optionalSemester.isPresent()) {
-					mStringBuilder.append("im ");
+					mStringBuilder.append(" im ");
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
 					mStringBuilder.append(" Semester ");
 				}
 				mStringBuilder.append(" ist ");
 				myCourse.forEach(element -> {
-					String dateString = Utils.parseDate(element.getStartTime());
+					String dateString = Utils.parseDateSimplified(element.getStartTime());
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" am ");
-					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
+					mStringBuilder.append(Utils.parseDateToDayWeek((element.getStartTime())));
+					mStringBuilder.append(" ");
+					if (optionalDate.isEmpty()) {
+						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
+					}
 					mStringBuilder.append(" um ");
 					mStringBuilder.append(dateString.split(",")[1]);
 					mStringBuilder.append(" ");

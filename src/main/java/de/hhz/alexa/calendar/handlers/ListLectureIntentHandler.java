@@ -25,7 +25,7 @@ public class ListLectureIntentHandler implements RequestHandler {
 		Optional<Response> response = null;
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
-			String speechText = "Dein Vorlesungskalendar is nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
+			String speechText = "Dein Vorlesungskalendar ist nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
 			return input.getResponseBuilder().withSpeech(speechText).withSimpleCard("Vorlesung", speechText).build();
 		}
 		String token = requestHelper.getAccountLinkingAccessToken();
@@ -36,18 +36,16 @@ public class ListLectureIntentHandler implements RequestHandler {
 
 		String event = optionalEventType.get();
 		if (event.toLowerCase().contains("prüfung") || event.toLowerCase().contains("klasur")) {
-			return ExamBuilder.build(input, token, optionalSemester);
+			return ExamBuilder.build(input, token, optionalSemester,optionalDate);
 
 		}
-		if (optionalDate.isPresent()) {
-			response = LectureByDayBuilder.build(input, token, optionalDate, optionalSemester);
+		if (optionalDate.isPresent() || optionalSemester.isPresent()||event.toLowerCase().contains("vorlesung")
+				|| event.toLowerCase().contains("vorlesen")) {
+			response = LectureByDayBuilder.build(input, token, optionalSemester, optionalDate);
 		} else if (optionalTeacher.isPresent()) {
 			response = LectureByTeacherBuilder.build(input, token, optionalTeacher, optionalSemester);
-		} else if (optionalSemester.isPresent() || (event.toLowerCase().contains("vorlesung")
-				|| event.toLowerCase().contains("vorlesen") || event.toLowerCase().contains("klasur"))) {
-			response = LectureBySemesterBuilder.build(input, token, optionalSemester);
 		} else {
-			response = input.getResponseBuilder().withSpeech("Ich habe leider dazu keine Antwort")
+			response = input.getResponseBuilder().withSpeech("Ich habe leider zu dieser Frage keine Antwort")
 					.withReprompt(Utils.REPROMT).build();
 
 		}

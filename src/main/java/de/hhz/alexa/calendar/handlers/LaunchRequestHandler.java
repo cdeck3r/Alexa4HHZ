@@ -58,7 +58,7 @@ public class LaunchRequestHandler implements RequestHandler {
 						mStringBuilder.append(" ist ausgefallen.");
 					} else if (element.isPosponed()) {
 						mStringBuilder.append(" wurde verschoben. Neuen Termin:");
-						String dateString = Utils.parseDate(element.getStartTime());
+						String dateString = Utils.parseDateSimplified(element.getStartTime());
 						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 						mStringBuilder.append(" ");
 						mStringBuilder.append(dateString.split(",")[1]);

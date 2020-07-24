@@ -66,24 +66,6 @@ public class BDCourse {
 		return courses;
 	}
 
-	/**
-	 * List events that are not course
-	 * 
-	 * @param dateString
-	 * @return
-	 * @throws Exception
-	 */
-	@SuppressWarnings("deprecation")
-	public List<HHZEvent> listEventByDate(final String dateString) throws Exception {
-		List<HHZEvent> courses = mCalendarUtils.listEvents();
-		if (Strings.isNullOrEmpty(dateString)) {
-			return courses.stream().filter(element -> isNextEvent(element) && !element.isCourse()).limit(1)
-					.collect(Collectors.toList());
-		}
-		return courses.stream().filter(element -> isNextEvent(element) && !element.isCourse()
-				&& filterByDate(dateString, element.getStartTime())).limit(1).collect(Collectors.toList());
-	}
-
 	public List<HHZEvent> listModifiedEvents() throws Exception {
 		return mCalendarUtils.listModifiedEvents();
 
@@ -113,15 +95,29 @@ public class BDCourse {
 	 * 
 	 * @throws Exception
 	 */
-	public List<HHZEvent> listLectureBySemester(String semester) throws Exception {
-		if(Strings.isNullOrEmpty(semester)) {
+	public List<HHZEvent> listLectureByDateAndSemester(String semester, String dateString) throws Exception {
+		if (!Strings.isNullOrEmpty(semester) && !Strings.isNullOrEmpty(dateString)) {
+			return this.mCalendarUtils.listEvents().stream()
+					.filter(element -> isNextEvent(element) && element.isCourse()
+							&& filterByDate(dateString, element.getStartTime())
+							&& element.getSemester().contains(semester))
+					.collect(Collectors.toList());
+		}
+		if (!Strings.isNullOrEmpty(semester)) {
 			return this.mCalendarUtils.listEvents().stream().filter(
-					element -> isNextEvent(element) && element.isCourse())
+					element -> isNextEvent(element) && element.isCourse() && element.getSemester().contains(semester))
 					.limit(1).collect(Collectors.toList());
 		}
-		return this.mCalendarUtils.listEvents().stream().filter(
-				element -> isNextEvent(element) && element.isCourse() && element.getSemester().contains(semester))
+
+		if (!Strings.isNullOrEmpty(dateString)) {
+			return this.mCalendarUtils.listEvents().stream().filter(element -> isNextEvent(element)
+					&& element.isCourse() && filterByDate(dateString, element.getStartTime()))
+					.collect(Collectors.toList());
+		}
+
+		return this.mCalendarUtils.listEvents().stream().filter(element -> isNextEvent(element) && element.isCourse())
 				.limit(1).collect(Collectors.toList());
+
 	}
 
 	/**
@@ -129,19 +125,36 @@ public class BDCourse {
 	 * 
 	 * @throws Exception
 	 */
-	public List<HHZEvent> listExams(final String semester) throws Exception {
-		if (Strings.isNullOrEmpty(semester)) {
+	public List<HHZEvent> listExams(final String semester, final String dateString) throws Exception {
+		if (!Strings.isNullOrEmpty(semester) && !Strings.isNullOrEmpty(dateString)) {
 			return this.mCalendarUtils.listEvents().stream()
 					.filter(element -> isNextEvent(element) && element.isCourse() && element.getType() != null
-							&& element.getType().toLowerCase().contains(SUFFIX_EXAM))
-					.limit(1).collect(Collectors.toList());
-		} else {
+							&& element.getType().toLowerCase().contains(SUFFIX_EXAM)
+							&& filterByDate(dateString, element.getStartTime())
+							&& element.getSemester().contains(semester))
+					.collect(Collectors.toList());
+		}
+		if (!Strings.isNullOrEmpty(semester)) {
 			return this.mCalendarUtils.listEvents().stream()
 					.filter(element -> isNextEvent(element) && element.isCourse() && element.getType() != null
 							&& element.getType().toLowerCase().contains(SUFFIX_EXAM)
 							&& element.getSemester().contains(semester))
 					.limit(1).collect(Collectors.toList());
 		}
+
+		if (!Strings.isNullOrEmpty(dateString)) {
+			return this.mCalendarUtils.listEvents().stream()
+					.filter(element -> isNextEvent(element) && element.isCourse() && element.getType() != null
+							&& element.getType().toLowerCase().contains(SUFFIX_EXAM)
+							&& filterByDate(dateString, element.getStartTime()))
+					.collect(Collectors.toList());
+		}
+
+		return this.mCalendarUtils
+				.listEvents().stream().filter(element -> isNextEvent(element) && element.isCourse()
+						&& element.getType() != null && element.getType().toLowerCase().contains(SUFFIX_EXAM))
+				.limit(1).collect(Collectors.toList());
+
 	}
 
 	@SuppressWarnings("deprecation")

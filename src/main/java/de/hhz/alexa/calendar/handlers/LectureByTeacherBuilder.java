@@ -15,8 +15,8 @@ import de.hhz.alexa.calendar.utils.Utils;
 public class LectureByTeacherBuilder {
 	private static StringBuilder mStringBuilder;
 
-	
-	public static Optional<Response> build(HandlerInput input, String token, Optional<String> optionalTeacher,Optional<String> optionalSemester) {
+	public static Optional<Response> build(HandlerInput input, String token, Optional<String> optionalTeacher,
+			Optional<String> optionalSemester) {
 		mStringBuilder = new StringBuilder();
 		mStringBuilder.append("<speak>");
 		try {
@@ -41,9 +41,11 @@ public class LectureByTeacherBuilder {
 				mStringBuilder.append(" ist ");
 
 				myCourse.forEach(element -> {
-					String dateString = Utils.parseDate(element.getStartTime());
+					String dateString = Utils.parseDateSimplified(element.getStartTime());
 					mStringBuilder.append(element.getDescription());
 					mStringBuilder.append(" am ");
+					mStringBuilder.append(Utils.parseDateToDayWeek((element.getStartTime())));
+					mStringBuilder.append(" ");
 					mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
 					mStringBuilder.append(" ");
 					mStringBuilder.append(dateString.split(",")[1]);
