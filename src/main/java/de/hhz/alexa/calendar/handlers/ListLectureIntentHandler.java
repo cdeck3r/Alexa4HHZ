@@ -22,7 +22,6 @@ public class ListLectureIntentHandler implements RequestHandler {
 
 	@Override
 	public Optional<Response> handle(HandlerInput input) {
-		Optional<Response> response = null;
 		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
 		if (Strings.isNullOrEmpty(requestHelper.getAccountLinkingAccessToken())) {
 			String speechText = "Dein Vorlesungskalendar ist nicht verknüpft. Verknüpft es bitte über die Skilleinstellung.";
@@ -34,22 +33,19 @@ public class ListLectureIntentHandler implements RequestHandler {
 		Optional<String> optionalTeacher = requestHelper.getSlotValue("teacher");
 		Optional<String> optionalEventType = requestHelper.getSlotValue("eventType");
 
-		String event = optionalEventType.get();
+		String event = optionalEventType.orElse("");
 		if (event.toLowerCase().contains("prüfung") || event.toLowerCase().contains("klasur")) {
-			return ExamBuilder.build(input, token, optionalSemester,optionalDate);
+			return ExamBuilder.build(input, token, optionalSemester, optionalDate);
 
 		}
-		if (optionalDate.isPresent() || optionalSemester.isPresent()||event.toLowerCase().contains("vorlesung")
+		if (optionalTeacher.isPresent()) {
+			return LectureByTeacherBuilder.build(input, token, optionalTeacher, optionalSemester);
+		} else if (optionalDate.isPresent() || optionalSemester.isPresent() || event.toLowerCase().contains("vorlesung")
 				|| event.toLowerCase().contains("vorlesen")) {
-			response = LectureByDayBuilder.build(input, token, optionalSemester, optionalDate);
-		} else if (optionalTeacher.isPresent()) {
-			response = LectureByTeacherBuilder.build(input, token, optionalTeacher, optionalSemester);
-		} else {
-			response = input.getResponseBuilder().withSpeech("Ich habe leider zu dieser Frage keine Antwort")
-					.withReprompt(Utils.REPROMT).build();
-
+			return LectureByDayBuilder.build(input, token, optionalSemester, optionalDate);
 		}
-		return response;
+		return input.getResponseBuilder().withSpeech("Das weiß ich leider nicht.")
+				.withReprompt(Utils.REPROMT).build();
 	}
 
 }

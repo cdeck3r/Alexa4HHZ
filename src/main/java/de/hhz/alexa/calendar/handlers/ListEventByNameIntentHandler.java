@@ -32,7 +32,7 @@ public class ListEventByNameIntentHandler implements RequestHandler {
 		}
 		Optional<String> name = requestHelper.getSlotValue("eventName");
 		if (name.isEmpty()) {
-			return input.getResponseBuilder().withSpeech("Ich habe leider dazu keine Antwort")
+			return input.getResponseBuilder().withSpeech("Entschuldigung, das weiﬂ ich leider nicht.")
 					.withReprompt(Utils.REPROMT).build();
 		}
 		mStringBuilder = new StringBuilder();

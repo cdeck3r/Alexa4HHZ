@@ -24,14 +24,14 @@ public class LectureByDayBuilder {
 					.listLectureByDateAndSemester( optionalSemester.orElse(""),optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
 				mStringBuilder.append("Es gibt keine Vorlesung ");
-				if (optionalDate.isPresent()) {
-					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
-					mStringBuilder.append(" ");
-				}
 				if (optionalSemester.isPresent() && !optionalSemester.get().equals("?")) {
 					mStringBuilder.append(" im ");
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
 					mStringBuilder.append(" Semester ");
+				}
+				if (optionalDate.isPresent()) {
+					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
+					mStringBuilder.append(".");
 				}
 			} else {
 				if (optionalDate.isPresent()) {
