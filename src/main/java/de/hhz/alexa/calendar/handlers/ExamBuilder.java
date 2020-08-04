@@ -25,7 +25,7 @@ public class ExamBuilder {
 			List<HHZEvent> myCourse = BDCourse.getInstance().getInstanceByUser(token)
 					.listExams(optionalSemester.orElse(""),optionalDate.orElse(""));
 			if (myCourse.size() < 1) {
-				mStringBuilder.append("Es gibt keine Prüfung ");
+				mStringBuilder.append("Es gibt ");
 				if (optionalDate.isPresent()) {
 					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
 					mStringBuilder.append(" ");
@@ -33,12 +33,16 @@ public class ExamBuilder {
 				if (optionalSemester.isPresent() && !optionalSemester.get().equals("?")) {
 					mStringBuilder.append("im ");
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
-					mStringBuilder.append(" Semester.");
+					mStringBuilder.append(" Semester ");
 				}
+				mStringBuilder.append(" keine Prüfung. ");
+
 
 			} else {
 				if (optionalDate.isPresent()) {
 					mStringBuilder.append(Utils.translateDate(optionalDate.get()));
+					mStringBuilder.append(" ist ");
+
 				} else {
 						mStringBuilder.append("Die nächste Prüfung ");
 					}
@@ -47,12 +51,18 @@ public class ExamBuilder {
 					mStringBuilder.append(AppConstants.ORDINAL.get(optionalSemester.get()));
 					mStringBuilder.append(" Semester ");
 				}
+				if(optionalDate.isEmpty()) {
 				mStringBuilder.append(" ist ");
+				}
+				
 				myCourse.forEach(element -> {
 					String dateString = Utils.parseDateSimplified(element.getStartTime());
 					mStringBuilder.append(element.getDescription());
-					mStringBuilder.append(" am ");
-					mStringBuilder.append(Utils.parseDateToDayWeek((element.getStartTime())));
+					if (optionalDate.isEmpty() || (optionalDate.isPresent() && (!Utils.translateDate(optionalDate.get()).equals("heute")
+							&& !Utils.translateDate(optionalDate.get()).equals("morgen")))) {
+						mStringBuilder.append(" am ");
+						mStringBuilder.append(Utils.parseDateToDayWeek((element.getStartTime())));
+					}
 					mStringBuilder.append(" ");
 					if (optionalDate.isEmpty()) {
 						mStringBuilder.append("<say-as interpret-as='date'>" + dateString.split(",")[0] + "</say-as>");
