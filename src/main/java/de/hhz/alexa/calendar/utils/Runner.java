@@ -47,14 +47,12 @@ public class Runner {
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 		Credential credentials=getCredentials(HTTP_TRANSPORT);
 		String token = credentials.getAccessToken();
-		System.out.println(token);
-		System.out.println(credentials.getRefreshToken());
-		System.out.println(credentials.getExpiresInSeconds());
+		
 		BDCourse bdCourse= BDCourse.getInstance().getInstanceByUser(token);
 //		DataSourceFactory.getInstance().setUser(bdCourse.getEmail());
+		bdCourse.listModifiedEvents().forEach(c->{System.out.println(c.getDescription());System.out.println(c.getId());});
 
 		bdCourse.listEventByName("testvorlesung").forEach(c->{System.out.println(c.getDescription());});
-		bdCourse.listModifiedEvents().forEach(c->{System.out.println(c.getDescription());System.out.println(c.getId());});
 
 //		HHZEvent event=DataSourceFactory.getInstance().loadEvents(10).get(1);
 //		System.out.println(event.getId()+"--"+event.getUser()+"-- "+event.geteTag());

@@ -16,6 +16,9 @@ package de.hhz.alexa.calendar.handlers;
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
+import com.amazon.ask.request.RequestHelper;
+
+import de.hhz.alexa.calendar.utils.BDCourse;
 
 import java.util.Optional;
 
@@ -30,6 +33,13 @@ public class CancelandStopIntentHandler implements RequestHandler {
     @Override
     public Optional<Response> handle(HandlerInput input) {
         String speechText = "Der Kalender schlieﬂt";
+        RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
+		try {
+			BDCourse.getInstance().removeUserInstance(requestHelper.getAccountLinkingAccessToken());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
         return input.getResponseBuilder()
                 .withSpeech(speechText)
                 .build();

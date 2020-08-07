@@ -105,6 +105,10 @@ public class CalendarUtils {
 			if (counter >= limit) {
 				break;
 			}
+			if (ev.getStartTime().before(new Date())) {
+				DataSourceFactory.getInstance().deleteEvent(ev, this.user);
+				continue;
+			}
 			counter++;
 			Calendar.Events.Get getRequest = service.events().get("primary", ev.getId()).setCalendarId(HHZ_CALENDAR);
 			getRequest.setRequestHeaders(new HttpHeaders().setIfNoneMatch(ev.geteTag()));

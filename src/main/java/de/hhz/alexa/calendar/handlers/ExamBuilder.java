@@ -1,7 +1,6 @@
 
 package de.hhz.alexa.calendar.handlers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

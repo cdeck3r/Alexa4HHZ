@@ -191,4 +191,9 @@ public class BDCourse {
 		return mBDCourse;
 
 	}
+	public void removeUserInstance(String token) throws Exception {
+		if (instances.containsKey(token)) {
+			 instances.remove(token);
+		}
+	}
 }

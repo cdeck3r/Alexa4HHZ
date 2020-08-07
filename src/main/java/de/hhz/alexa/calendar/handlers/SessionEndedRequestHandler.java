@@ -13,14 +13,17 @@
 
 package de.hhz.alexa.calendar.handlers;
 
+import static com.amazon.ask.request.Predicates.requestType;
+
+import java.util.Optional;
+
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.model.SessionEndedRequest;
+import com.amazon.ask.request.RequestHelper;
 
-import java.util.Optional;
-
-import static com.amazon.ask.request.Predicates.requestType;
+import de.hhz.alexa.calendar.utils.BDCourse;
 
 public class SessionEndedRequestHandler implements RequestHandler {
 
@@ -31,6 +34,14 @@ public class SessionEndedRequestHandler implements RequestHandler {
 
     @Override
     public Optional<Response> handle(HandlerInput input) {
+		RequestHelper requestHelper = RequestHelper.forHandlerInput(input);
+		try {
+			BDCourse.getInstance().removeUserInstance(requestHelper.getAccountLinkingAccessToken());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
+		
         return input.getResponseBuilder().withSpeech("").build();
     }
 
