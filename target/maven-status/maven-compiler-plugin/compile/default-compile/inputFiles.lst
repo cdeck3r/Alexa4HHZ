@@ -1,0 +1,16 @@
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\utils\HHZEvent.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\ListLectureByTeacherIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\ListLectureBySemesterIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\utils\BDCourse.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\SessionEndedRequestHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\ListEventByNameIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\ListExamIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\CancelandStopIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\HelpIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\LaunchRequestHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\ListEventIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\utils\Utils.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\datasource\DataSourceFactory.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calender\CalendarStreamHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\handlers\ListLectureIntentHandler.java
+C:\Users\Lenovo\Documents\Alexa4HHZ\src\main\java\de\hhz\alexa\calendar\utils\CalendarUtils.java
