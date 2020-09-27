@@ -23,7 +23,7 @@ import com.amazon.ask.model.Response;
 import com.amazon.ask.model.SessionEndedRequest;
 import com.amazon.ask.request.RequestHelper;
 
-import de.hhz.alexa.calendar.utils.BDCourse;
+import de.hhz.alexa.calendar.calender.BDCourse;
 
 public class SessionEndedRequestHandler implements RequestHandler {
 

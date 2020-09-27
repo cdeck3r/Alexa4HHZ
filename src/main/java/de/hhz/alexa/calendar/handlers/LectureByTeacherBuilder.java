@@ -7,9 +7,9 @@ import java.util.Optional;
 import com.amazon.ask.dispatcher.request.handler.HandlerInput;
 import com.amazon.ask.model.Response;
 
-import de.hhz.alexa.calendar.utils.AppConstants;
-import de.hhz.alexa.calendar.utils.BDCourse;
-import de.hhz.alexa.calendar.utils.HHZEvent;
+import de.hhz.alexa.calendar.calender.AppConstants;
+import de.hhz.alexa.calendar.calender.BDCourse;
+import de.hhz.alexa.calendar.calender.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
 
 public class LectureByTeacherBuilder {

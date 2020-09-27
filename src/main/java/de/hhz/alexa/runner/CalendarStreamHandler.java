@@ -11,7 +11,7 @@
      the specific language governing permissions and limitations under the License.
 */
 
-package de.hhz.alexa.calender;
+package de.hhz.alexa.runner;
 
 import com.amazon.ask.Skill;
 import com.amazon.ask.SkillStreamHandler;
@@ -24,7 +24,6 @@ import de.hhz.alexa.calendar.handlers.ListEventByNameIntentHandler;
 import de.hhz.alexa.calendar.handlers.ListLectureIntentHandler;
 import de.hhz.alexa.calendar.handlers.SessionEndedRequestHandler;
 
-//mvn assembly:assembly -DdescriptorId=jar-with-dependencies package
 
 public class CalendarStreamHandler extends SkillStreamHandler {
 
@@ -38,8 +37,6 @@ public class CalendarStreamHandler extends SkillStreamHandler {
                         new LaunchRequestHandler(),
                         new ListEventByNameIntentHandler(),
                         new SessionEndedRequestHandler())
-                // Add your skill id below
-                //.withSkillId("")
                 .build();
     }
 

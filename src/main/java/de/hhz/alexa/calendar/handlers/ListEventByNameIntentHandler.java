@@ -5,8 +5,9 @@ import com.amazon.ask.dispatcher.request.handler.RequestHandler;
 import com.amazon.ask.model.Response;
 import com.amazon.ask.request.RequestHelper;
 import com.google.api.client.util.Strings;
-import de.hhz.alexa.calendar.utils.BDCourse;
-import de.hhz.alexa.calendar.utils.HHZEvent;
+
+import de.hhz.alexa.calendar.calender.BDCourse;
+import de.hhz.alexa.calendar.calender.HHZEvent;
 import de.hhz.alexa.calendar.utils.Utils;
 
 import java.util.List;

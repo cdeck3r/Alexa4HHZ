@@ -1,4 +1,4 @@
-package de.hhz.alexa.calendar.utils;
+package de.hhz.alexa.calendar.calender;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 
-public class Runner {
+public class Test {
 
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
@@ -28,7 +28,7 @@ public class Runner {
 	private static final String APPLICATION_NAME = "Alexa4HHZ";
 
 	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        InputStream in = Runner.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = Test.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }

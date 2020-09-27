@@ -1,4 +1,4 @@
-package de.hhz.alexa.calendar.utils;
+package de.hhz.alexa.calendar.calender;
 
 import java.util.Calendar;
 import java.util.Date;

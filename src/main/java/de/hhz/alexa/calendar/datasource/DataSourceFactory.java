@@ -29,7 +29,7 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 
-import de.hhz.alexa.calendar.utils.HHZEvent;
+import de.hhz.alexa.calendar.calender.HHZEvent;
 
 public class DataSourceFactory {
 	private String tableName = "Events";
