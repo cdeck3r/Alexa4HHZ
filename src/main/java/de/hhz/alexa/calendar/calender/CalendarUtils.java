@@ -27,7 +27,7 @@ public class CalendarUtils {
 	private static final String CANCELLED = "cancelled";
 	private static final String DBE_PREFIX = "DBE";
 	private static final String SCM_PREFIX = "SCM";
-	private static final int MAX_DB_EVENT = 10;
+	private static final int MAX_DB_EVENT = 7;
 	private String accessTocken;
 	private String user;
 	List<HHZEvent> eventList = new ArrayList<HHZEvent>();
