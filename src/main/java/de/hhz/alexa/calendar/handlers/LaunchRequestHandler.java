@@ -71,7 +71,7 @@ public class LaunchRequestHandler implements RequestHandler {
 		} catch (Exception e) {
 			mStringBuilder.append("Ein Fehler is beim starten des Skills aufgetretten");
 			mStringBuilder.append("</speak>");
-			speechText = mStringBuilder.toString();
+			speechText = e.getMessage();
 
 		}
 
